@@ -36,15 +36,15 @@ A sample result file *defaultSSAresult.txt* and a sample statistics file *defaul
 
 **Step 3. [Result Collection]** 
 
-Collect the querying results and running statistics (you can ignore this step if you don't want to collect the information of querying results and running statistics). The statistics file format is explained in Appendix D.
+Collect the querying results and running statistics (you can ignore this step if you don't want to collect the information of querying results and running statistics). The statistics file format is explained in Appendix D. 
 
 Appendix A. Parameter
 ============================
 
     <alg_opt>
-      =   1: Set-based Search Algorithm (SSA)
-      =   2: Adapted KoE 
-      =	  3: SSA without Pruning
+      =		1: Set-based Search Algorithm (SSA)
+      =		2: Adapted KoE 
+      =		3: SSA without Pruning
 
 Appendix B. Files Format
 ============================
