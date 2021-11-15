@@ -25,13 +25,22 @@ public class AlgSSA {
 
 	private double curKCost;
 
+	
+	//---
+	// storing intermediate result of a query for extension purpose
+	private PriorityQueue<ParSet> result;
+	private ArrayList<ArrayList<String>> canPars_list;
+	//---
+	
+	
 	// SSA
 	/**
+	 * 
 	 * 
 	 * @param sPoint
 	 * @param tPoint
 	 * @param QW
-	 * @param costMax = max. time
+	 * @param costMax = Delte_{Max} = max. time allowed !!
 	 * @param tau     = relevance threshold
 	 * @param k       = number of results
 	 * @return
@@ -96,17 +105,22 @@ public class AlgSSA {
 		for (int i = 0; i < QW.size(); i++) {
 			canPars_new.add(new ArrayList<>());
 		}
+		
+
 		for (int i = 0; i < canPars_list.size(); i++) {
 			ParSet parSet = new ParSet(QW.size());
 			ArrayList<String> curPar = canPars_list.get(i);
 			int pos = Integer.parseInt(curPar.get(2));
 			parSet.setPar(curPar, pos);
-
+			// Step 2. iteratore key partition sets
 			findKeyParsSets(canPars_new, parSet, 0, //
 					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, result, k, pos, canPars_list);
 			canPars_new.get(pos).add(curPar);
 
 		}
+		
+		
+		//convert each result to string and return
 		ArrayList<String> r = new ArrayList<>();
 		while (result.size() > 0) {
 			ParSet parSet = result.poll();
@@ -114,6 +128,11 @@ public class AlgSSA {
 		}
 		Collections.reverse(r);
 
+		//---
+		this.canPars_list = canPars_list;
+		this.result = result;
+		//---
+		
 		return r;
 	}
 
@@ -263,6 +282,7 @@ public class AlgSSA {
 				double timeCost_last = Double.parseDouble(subPathArr[0]);
 
 
+				//a feasible path found, return here
 				double timeCost = curTimeCost + timeCost_last;
 				if (timeCost < costMax) {
 					String finalPath = "";
@@ -562,6 +582,17 @@ public class AlgSSA {
 		}
 		return result;
 	}
+
+	
+	public PriorityQueue<ParSet> getResult() {
+		return result;
+	}
+
+
+	public ArrayList<ArrayList<String>> getCanPars_list() {
+		return canPars_list;
+	}
+
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
