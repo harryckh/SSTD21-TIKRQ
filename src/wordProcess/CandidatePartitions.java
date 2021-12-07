@@ -133,7 +133,7 @@ public class CandidatePartitions {
 	// test
 	public static void main(String[] arg) throws IOException {
 		ReadWord readWord = new ReadWord();
-		readWord.readRelation();
+		readWord.readRelation("hsm");
 		CandidatePartitions candidatePartitions = new CandidatePartitions(new ArrayList<>(Arrays
 				.asList("shoes", "china construction bank (asia)")), 0.04);
 		ArrayList<ArrayList<ArrayList<String>>> allPars = candidatePartitions.findAllCandPars();

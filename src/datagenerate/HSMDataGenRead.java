@@ -23,11 +23,8 @@ import java.util.Scanner;
  */
 public class HSMDataGenRead {
 
-    public static String inputDoor = System.getProperty("user.dir") + "/inputfiles/HSM/Door_new.txt";
-    public static String inputRoom = System.getProperty("user.dir") + "/inputfiles/HSM/Par_new.txt";
-
-    public static String inputDoor1 = System.getProperty("user.dir") + "/inputfiles/map_to_txt_data/door_final.txt";
-    public static String inputRoom1 = System.getProperty("user.dir") + "/inputfiles/map_to_txt_data/par_final.txt";
+    public static String inputDoor = System.getProperty("user.dir") + "/HSM/door_final.txt";
+    public static String inputRoom = System.getProperty("user.dir") + "/HSM/par_final.txt";
 
 
     public static void main(String[] args) throws IOException {
@@ -38,12 +35,6 @@ public class HSMDataGenRead {
     }
 
     public void dataGen(String dataset) throws IOException {
-        if (dataset.equals("newHsm")) {
-            inputDoor = inputDoor1;
-            inputRoom = inputRoom1;
-            System.out.println(inputDoor);
-            System.out.println(inputRoom);
-        }
 
         // load the data generation constants of HSM dataset
         DataGenConstant.init(dataset);

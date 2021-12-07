@@ -23,13 +23,13 @@ public class AlgSSA {
 
 	public static double alpha = 0.5;
 
-	private double curKCost;
+	public double curKCost;
 
 	
 	//---
 	// storing intermediate result of a query for extension purpose
-	private PriorityQueue<ParSet> result;
-	private ArrayList<ArrayList<String>> canPars_list;
+	public PriorityQueue<ParSet> result = new PriorityQueue<ParSet>(Comparator.reverseOrder());
+	public ArrayList<ArrayList<String>> canPars_list = new ArrayList<>();
 	//---
 	
 	
@@ -41,7 +41,7 @@ public class AlgSSA {
 	 * @param tPoint
 	 * @param QW
 	 * @param costMax = Delte_{Max} = max. time allowed !!
-	 * @param tau     = relevance threshold
+	 * @param scorMin     = relevance threshold
 	 * @param k       = number of results
 	 * @return
 	 * @throws IOException
@@ -110,35 +110,42 @@ public class AlgSSA {
 		for (int i = 0; i < canPars_list.size(); i++) {
 			ParSet parSet = new ParSet(QW.size());
 			ArrayList<String> curPar = canPars_list.get(i);
+
+//			Partition par = IndoorSpace.iPartitions.get(Integer.parseInt(curPar.get(0)));
+//			double cost = alpha * (double) par.getStaticCost() / DataGenConstant.SC_MAX
+//					+ (1.0 - alpha) * (1 - Double.parseDouble(curPar.get(1)));
+//			System.out.println("partitionId: " + curPar.get(0) + " cost: " + cost);
+
 			int pos = Integer.parseInt(curPar.get(2));
 			parSet.setPar(curPar, pos);
 			// Step 2. iteratore key partition sets
 			findKeyParsSets(canPars_new, parSet, 0, //
 					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, result, k, pos, canPars_list);
 			canPars_new.get(pos).add(curPar);
-
 		}
-		
-		
+
 		//convert each result to string and return
 		ArrayList<String> r = new ArrayList<>();
 		while (result.size() > 0) {
 			ParSet parSet = result.poll();
-			r.add(parSet.toString() + " " + parSet.path);
+			this.result.add(parSet);
+			r.add(parSet.toString() + " " + parSet.getTimeCost() + " " + parSet.getParSetPath());
 		}
 		Collections.reverse(r);
+//		System.out.println("size2: " + this.result.size());
 
 		//---
 		this.canPars_list = canPars_list;
-		this.result = result;
+//		this.result = result;
+//		System.out.println("size1: " + this.result.size());
 		//---
-		
+
 		return r;
 	}
 
 	// dynamic approach
 	// find all key partition sets
-	private void findKeyParsSets(ArrayList<ArrayList<ArrayList<String>>> canPars_all, ParSet parSet, int depth,
+	public void findKeyParsSets(ArrayList<ArrayList<ArrayList<String>>> canPars_all, ParSet parSet, int depth,
 			double wTimeMax, double costMax, Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
 			PriorityQueue<ParSet> result, int k, int pos, ArrayList<ArrayList<String>> canPars_list) {
 
@@ -148,21 +155,29 @@ public class AlgSSA {
 		// pruning 3
 		if (depth == canPars_all.size()) {
 			// base case
+//			System.out.println("parset info: " + parSet.toString());
 
-			if (parSet.calcTotalCost(depth) >= curKCost)
+			if (parSet.calcTotalCost(depth) >= curKCost) {
+//                System.out.println("greater than curKCost");
 				return;
+            }
 			// Step 3. (Feasible Route Finding)
 			String feasiblePath = findFeasiblePath(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(),
 					parSet.getwTime(), costMax, canPars_list);
 
 			if (feasiblePath != null && feasiblePath != "") {
 				ParSet pSet = new ParSet(parSet);
-				pSet.path = feasiblePath;
+				double timeCost = Double.parseDouble(feasiblePath.split(" ")[0]);
+				String path = feasiblePath.split(" ")[1];
+				pSet.setTimeCost(timeCost);
+				pSet.setParSetPath(path);
 				result.add(pSet);
+//                System.out.println("feasible: " + pSet.toString());
 
 				if (result.size() > k) {
 					result.poll();// remove max cost one
 					curKCost = result.peek().calcTotalCost(canPars_all.size());
+//                    System.out.println("k: " + result.peek().toString());
 				}
 				return;
 
@@ -195,7 +210,7 @@ public class AlgSSA {
 	}
 
 	// calculate the max wait time
-	private double calWTimeMax(Point ps, Point pt, Partition sPartition, Partition tPartition, double costMax) {
+	public double calWTimeMax(Point ps, Point pt, Partition sPartition, Partition tPartition, double costMax) {
 		double wTimeMax = 0;
 		String dist_path = CommonFunction.findShortestPath(ps, pt, sPartition, tPartition);
 		double dist = Double.parseDouble(dist_path.split("\t")[0]);
@@ -208,9 +223,10 @@ public class AlgSSA {
 	}
 
 	int cntFindFeasiblePath = 0;
+	ArrayList<String> inResultParSet = new ArrayList<>();
 
 	// find feasible path for a partition set
-	private String findFeasiblePath(Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
+	public String findFeasiblePath(Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
 			short[] parSet, double setWaitTime, double costMax, ArrayList<ArrayList<String>> canPars_list) {
 		String result = "";
 		cntFindFeasiblePath++;
@@ -227,13 +243,21 @@ public class AlgSSA {
 
 		/// initialize parList as partition not visited yet
 		ArrayList<Integer> parList = new ArrayList<>();
-//		for (ArrayList<String> par : parSet) 
+//		for (ArrayList<String> par : parSet)
+		String parSetString = "";
 		for (int i = 0; i < parSet.length; i++) {
+			parSetString += parSet[i];
 			int parId = parSet[i];
 			if (!(parId == sPartition.getmID() || parId == tPartition.getmID()))
 				if (parId != -1)
 					parList.add(parId);
 		}
+
+        // only for extension version
+		if (inResultParSet.contains(parSetString)) {
+//            System.out.println("contains...");
+            return null;
+        }
 
 		// initialize the priority queues
 		MinHeap<Stamp> Q = new MinHeap<>("set");
@@ -293,7 +317,7 @@ public class AlgSSA {
 						finalPath += subPathArr[i] + "\t";
 					}
 					finalPath += pt + "";
-					result = timeCost + "\t" + finalPath;
+					result = timeCost + " " + finalPath;
 					return result;
 				}
 
@@ -585,12 +609,12 @@ public class AlgSSA {
 
 	
 	public PriorityQueue<ParSet> getResult() {
-		return result;
+		return this.result;
 	}
 
 
 	public ArrayList<ArrayList<String>> getCanPars_list() {
-		return canPars_list;
+		return this.canPars_list;
 	}
 
 

@@ -23,6 +23,7 @@ public class ParSet implements Comparable<ParSet> {
 	private double totalCost = 0;
 	private double alpha = AlgSSA.alpha;
 	public String path = ""; // store the resulting feasible path
+	public double timeCost = 0;
 
 	public ParSet(int size) {
 		// TODO Auto-generated constructor stub
@@ -65,6 +66,7 @@ public class ParSet implements Comparable<ParSet> {
 		// add SC, wTime and rele
 		Partition partition = IndoorSpace.iPartitions.get(parId);
 		SC += partition.getStaticCost();
+//		System.out.print("  static cost: " + SC);
 		wTime += partition.getWaitTime();
 
 		relevance += rel[i];
@@ -188,8 +190,9 @@ public class ParSet implements Comparable<ParSet> {
 
 		if (totalCost > anotherParSet.totalCost)
 			return 1;
-		else if (totalCost == anotherParSet.totalCost)
+		else if (totalCost == anotherParSet.totalCost) {
 			return 0;
+		}
 		else
 			return -1;
 	}
@@ -221,5 +224,15 @@ public class ParSet implements Comparable<ParSet> {
 	public void setTotalScore(double totalScore) {
 		this.totalCost = totalScore;
 	}
+
+	public double[] getRel() { return rel; }
+
+	public String getParSetPath() { return path; }
+
+	public void setParSetPath(String path) { this.path = path; }
+
+	public double getTimeCost() { return this.timeCost; }
+
+	public void setTimeCost(double timeCost) { this.timeCost = timeCost; }
 
 }

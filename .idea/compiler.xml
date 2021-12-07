@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="SSTD21-tikrq" />
         <module name="CIKRQ" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="CIKRQ" target="9" />
+      <module name="SSTD21-tikrq" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

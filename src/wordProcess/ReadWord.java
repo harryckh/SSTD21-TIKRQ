@@ -21,14 +21,26 @@ public class ReadWord {
 	public static HashMap<String, Integer> index_itword = new HashMap<>();
 	public static HashMap<String, ArrayList<Integer>> par_cword_c = new HashMap<>();
 
-	private static String inputFile_par_tword_t = System.getProperty("user.dir") + "/words/par_tword_t.txt";
-	private static String inputFile_par_tword_p = System.getProperty("user.dir") + "/words/par_tword_p.txt";
-	private static String inputFile_par_iword_i = System.getProperty("user.dir") + "/words/par_iword_i.txt";
+	private static String inputFile_par_tword_t;
+	private static String inputFile_par_tword_p;
+	private static String inputFile_par_iword_i;
+	private static String inputFile_par_cword_c;
 	private static String inputFile_ciword_c = System.getProperty("user.dir") + "/words/ciword_c.txt";
 	private static String inputFile_index_itword = System.getProperty("user.dir") + "/words/index_itword.txt";
-	private static String inputFile_par_cword_c = System.getProperty("user.dir") + "/words/par_cword_c.txt";
 
-	public void readRelation() throws IOException {
+	public void readRelation(String dataset) throws IOException {
+		if (dataset.equals("hsm")) {
+			inputFile_par_iword_i = System.getProperty("user.dir") + "/HSM/par_iword_i.txt";
+			inputFile_par_tword_t = System.getProperty("user.dir") + "/HSM/par_tword_t.txt";
+			inputFile_par_tword_p = System.getProperty("user.dir") + "/HSM/par_tword_p.txt";
+			inputFile_par_cword_c = System.getProperty("user.dir") + "/HSM/par_cword_c.txt";
+		}
+		if (dataset.equals("syn")) {
+			inputFile_par_iword_i = System.getProperty("user.dir") + "/SYN/par_iword_i.txt";
+			inputFile_par_tword_t = System.getProperty("user.dir") + "/SYN/par_tword_t.txt";
+			inputFile_par_tword_p = System.getProperty("user.dir") + "/SYN/par_tword_p.txt";
+			inputFile_par_cword_c = System.getProperty("user.dir") + "/SYN/par_cword_c.txt";
+		}
 		Path path = Paths.get(inputFile_par_iword_i);
 		Scanner scanner = new Scanner(path);
 		while (scanner.hasNextLine()) {

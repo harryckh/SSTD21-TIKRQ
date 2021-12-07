@@ -21,11 +21,11 @@ import java.util.Scanner;
  */
 
 public class AssignWords {
-	private static String fileInput_category = System.getProperty("user.dir") + "/words/ciword_i.txt";
-	private static String fileInput_iword = System.getProperty("user.dir") + "/words/wordRelationship_identity.txt";
-	private static String fileOutput = System.getProperty("user.dir") + "/words/partition_words.txt";
-	private static HashMap<Integer, ArrayList<Integer>> iword_t = new HashMap<>();
-	private static HashMap<Integer, String> iword_c = new HashMap<>();
+	private static String fileInput_ciword_i = System.getProperty("user.dir") + "/words/ciword_i.txt";
+	private static String fileInput_itword_i = System.getProperty("user.dir") + "/words/itword_i.txt";
+	private static String fileOutput = System.getProperty("user.dir") + "/SYN/partition_words.txt";
+	private static HashMap<Integer, ArrayList<Integer>> itword_i = new HashMap<>();
+	private static HashMap<Integer, String> ciword_i = new HashMap<>();
 
 	public void assignWords_save() throws IOException {
 		findRelationship();
@@ -33,13 +33,13 @@ public class AssignWords {
 
 		// update the relationship between partition and words
 		WordPro wordPro = new WordPro();
-		wordPro.par_tword_pro();
-		wordPro.par_iword_pro();
-		wordPro.par_cword_pro();
+		wordPro.par_tword_pro("syn");
+		wordPro.par_iword_pro("syn");
+		wordPro.par_cword_pro("syn");
 	}
 
 	public void assignWords_read() throws IOException {
-		Path path = Paths.get(System.getProperty("user.dir") + "/words/partition_words.txt");
+		Path path = Paths.get(fileOutput);
 		Scanner scanner = new Scanner(path);
 
 		while (scanner.hasNextLine()) {
@@ -75,16 +75,16 @@ public class AssignWords {
 			do {
 				iword = (int) (1 + Math.random() * (DataGenConstant.iWordSize - 1 + 1)) * (-1);
 				par.setIkeyword(iword);
-				par.setCategory(iword_c.get(iword));
+				par.setCategory(ciword_i.get(iword));
 				twords = assignTwords(iword);
 			} while (twords == null);
 
 			par.setTkeywords(twords);
 
 			System.out.println(
-					"parId: " + i + "; iword: " + iword + "; type: " + iword_c.get(iword) + "; rwords: " + twords);
+					"parId: " + i + "; iword: " + iword + "; type: " + ciword_i.get(iword) + "; rwords: " + twords);
 
-			result += i + "\t" + iword_c.get(iword) + "\t" + iword + "\t";
+			result += i + "\t" + ciword_i.get(iword) + "\t" + iword + "\t";
 			for (int j = 0; j < twords.size(); j++) {
 				result += twords.get(j) + "\t";
 			}
@@ -106,7 +106,7 @@ public class AssignWords {
 	}
 
 	private ArrayList<Integer> assignTwords(int iword) {
-		ArrayList<Integer> twords_all = iword_t.get(iword);
+		ArrayList<Integer> twords_all = itword_i.get(iword);
 		ArrayList<Integer> twords = new ArrayList<>();
 
 		int trial = 0;
@@ -129,7 +129,7 @@ public class AssignWords {
 	private void findRelationship() throws IOException {
 		String result = "";
 
-		Path path = Paths.get(fileInput_category);
+		Path path = Paths.get(fileInput_ciword_i);
 		Scanner scanner = new Scanner(path);
 
 		while (scanner.hasNextLine()) {
@@ -138,11 +138,11 @@ public class AssignWords {
 
 			int iword = Integer.parseInt(temp[0]);
 			String type = temp[1];
-			iword_c.put(iword, type);
+			ciword_i.put(iword, type);
 		}
 		scanner.close();
 
-		Path path1 = Paths.get(fileInput_iword);
+		Path path1 = Paths.get(fileInput_itword_i);
 		Scanner scanner1 = new Scanner(path1);
 
 		while (scanner1.hasNextLine()) {
@@ -154,7 +154,7 @@ public class AssignWords {
 			for (int i = 1; i < temp.length; i++) {
 				twords.add(Integer.parseInt(temp[i]));
 			}
-			iword_t.put(iword, twords);
+			itword_i.put(iword, twords);
 		}
 		scanner1.close();
 	}

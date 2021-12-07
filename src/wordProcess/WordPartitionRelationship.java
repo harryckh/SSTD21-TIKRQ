@@ -148,7 +148,7 @@ public class WordPartitionRelationship {
     // test
     public static void main (String arg[]) throws IOException {
         ReadWord readWord = new ReadWord();
-        readWord.readRelation();
+        readWord.readRelation("hsm");
         WordPartitionRelationship wr = new WordPartitionRelationship(504, 0.04);
         ArrayList<ArrayList<String>> cw = wr.transform(1);
         for (int i = 0; i < cw.size(); i++)

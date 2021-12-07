@@ -18,22 +18,28 @@ import java.util.Scanner;
 public class WordPro {
     private static String fileInput_ciword_c = System.getProperty("user.dir") + "/words/ciword_c.txt";
     private static String fileOutput_ciword_i = System.getProperty("user.dir") + "/words/ciword_i.txt";
-    private static String fileInput_partition_words = System.getProperty("user.dir") + "/words/partition_words.txt";
-    private static String fileOutput_par_tword_p= System.getProperty("user.dir") + "/words/par_tword_p.txt";
-    private static String fileOutput_par_tword_t = System.getProperty("user.dir") + "/words/par_tword_t.txt";
-    private static String fileOutput_par_iword_p= System.getProperty("user.dir") + "/words/par_iword_p.txt";
-    private static String fileOutput_par_iword_i = System.getProperty("user.dir") + "/words/par_iword_i.txt";
-    private static String fileOutput_par_cword_p= System.getProperty("user.dir") + "/words/par_cword_p.txt";
-    private static String fileOutput_par_cword_c = System.getProperty("user.dir") + "/words/par_cword_c.txt";
+    private static String fileInput_partition_words;
+    private static String fileOutput_par_tword_p;
+    private static String fileOutput_par_tword_t;
+    private static String fileOutput_par_iword_p;
+    private static String fileOutput_par_iword_i;
+    private static String fileOutput_par_cword_p;
+    private static String fileOutput_par_cword_c;
 
     private static HashMap<String, ArrayList<Integer>> category = new HashMap<>();
     private static HashMap<Integer, ArrayList<Integer>> par_twords = new HashMap<>();
     private static HashMap<Integer, Integer> par_iwords = new HashMap<>();
     private static HashMap<Integer, String> par_cwords = new HashMap<>();
 
-    public void par_tword_pro() throws IOException {
+    public void par_tword_pro(String dataset) throws IOException {
         String result1 = "";
         String result2 = "";
+        if (dataset.equals("hsm")) {
+            fileInput_partition_words = System.getProperty("user.dir") + "/HSM/partition_words.txt";
+        }
+        if (dataset.equals("syn")) {
+            fileInput_partition_words = System.getProperty("user.dir") + "/SYN/partition_words.txt";
+        }
         Path path = Paths.get(fileInput_partition_words);
         Scanner scanner = new Scanner(path);
 
@@ -63,6 +69,12 @@ public class WordPro {
         }
 
         try {
+            if (dataset.equals("hsm")) {
+                fileOutput_par_tword_p = System.getProperty("user.dir") + "/HSM/par_tword_p.txt";
+            }
+            if (dataset.equals("syn")) {
+                fileOutput_par_tword_p = System.getProperty("user.dir") + "/SYN/par_tword_p.txt";
+            }
             FileWriter fw = new FileWriter(fileOutput_par_tword_p);
             fw.write(result1);
             fw.flush();
@@ -73,6 +85,12 @@ public class WordPro {
             return;
         }
         try {
+            if (dataset.equals("hsm")) {
+                fileOutput_par_tword_t = System.getProperty("user.dir") + "/HSM/par_tword_t.txt";
+            }
+            if (dataset.equals("syn")) {
+                fileOutput_par_tword_t = System.getProperty("user.dir") + "/SYN/par_tword_t.txt";
+            }
             FileWriter fw = new FileWriter(fileOutput_par_tword_t);
             fw.write(result2);
             fw.flush();
@@ -84,9 +102,15 @@ public class WordPro {
         }
     }
 
-    public void par_iword_pro() throws IOException {
+    public void par_iword_pro(String dataset) throws IOException {
         String result1 = "";
         String result2 = "";
+        if (dataset.equals("hsm")) {
+            fileInput_partition_words = System.getProperty("user.dir") + "/HSM/partition_words.txt";
+        }
+        if (dataset.equals("syn")) {
+            fileInput_partition_words = System.getProperty("user.dir") + "/SYN/partition_words.txt";
+        }
         Path path = Paths.get(fileInput_partition_words);
         Scanner scanner = new Scanner(path);
 
@@ -110,6 +134,12 @@ public class WordPro {
         }
 
         try {
+            if (dataset.equals("hsm")) {
+                fileOutput_par_iword_p= System.getProperty("user.dir") + "/HSM/par_iword_p.txt";
+            }
+            if (dataset.equals("syn")) {
+                fileOutput_par_iword_p= System.getProperty("user.dir") + "/SYN/par_iword_p.txt";
+            }
             FileWriter fw = new FileWriter(fileOutput_par_iword_p);
             fw.write(result1);
             fw.flush();
@@ -120,6 +150,12 @@ public class WordPro {
             return;
         }
         try {
+            if (dataset.equals("hsm")) {
+                fileOutput_par_iword_i = System.getProperty("user.dir") + "/HSM/par_iword_i.txt";
+            }
+            if (dataset.equals("syn")) {
+                fileOutput_par_iword_i = System.getProperty("user.dir") + "/SYN/par_iword_i.txt";
+            }
             FileWriter fw = new FileWriter(fileOutput_par_iword_i);
             fw.write(result2);
             fw.flush();
@@ -131,9 +167,15 @@ public class WordPro {
         }
     }
 
-    public void par_cword_pro() throws IOException {
+    public void par_cword_pro(String dataset) throws IOException {
         String result1 = "";
         String result2 = "";
+        if (dataset.equals("hsm")) {
+            fileInput_partition_words = System.getProperty("user.dir") + "/HSM/partition_words.txt";
+        }
+        if (dataset.equals("syn")) {
+            fileInput_partition_words = System.getProperty("user.dir") + "/SYN/partition_words.txt";
+        }
         Path path = Paths.get(fileInput_partition_words);
         Scanner scanner = new Scanner(path);
 
@@ -157,6 +199,12 @@ public class WordPro {
         }
 
         try {
+            if (dataset.equals("hsm")) {
+                fileOutput_par_cword_p = System.getProperty("user.dir") + "/HSM/par_cword_p.txt";
+            }
+            if (dataset.equals("syn")) {
+                fileOutput_par_cword_p = System.getProperty("user.dir") + "/SYN/par_cword_p.txt";
+            }
             FileWriter fw = new FileWriter(fileOutput_par_cword_p);
             fw.write(result1);
             fw.flush();
@@ -167,6 +215,12 @@ public class WordPro {
             return;
         }
         try {
+            if (dataset.equals("hsm")) {
+                fileOutput_par_cword_c = System.getProperty("user.dir") + "/HSM/par_cword_c.txt";
+            }
+            if (dataset.equals("syn")) {
+                fileOutput_par_cword_c = System.getProperty("user.dir") + "/SYN/par_cword_c.txt";
+            }
             FileWriter fw = new FileWriter(fileOutput_par_cword_c);
             fw.write(result2);
             fw.flush();
@@ -270,9 +324,9 @@ public class WordPro {
     	System.out.println("Running WordPro...");
         WordPro wordPro = new WordPro();
         wordPro.ciword_pro();
-        wordPro.par_tword_pro();
-        wordPro.par_iword_pro();
-        wordPro.par_cword_pro();
+        wordPro.par_tword_pro("hsm");
+        wordPro.par_iword_pro("hsm");
+        wordPro.par_cword_pro("hsm");
     }
 
 }

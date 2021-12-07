@@ -13,11 +13,11 @@ import java.util.Scanner;
 
 public class AssignWtimeCost {
 
-    private static String fileInput = System.getProperty("user.dir") + "/info_cost_wtime/info_cost_wtime.txt";
+    private static String file;
 
     private Random random = new Random(1);
     
-    public void assignWtimeCost_save() {
+    public void assignWtimeCost_save(String dataset) {
         String result = "";
         for(Partition par: IndoorSpace.iPartitions) {
             // cost: [0, 10]
@@ -32,7 +32,13 @@ public class AssignWtimeCost {
         }
 
         try {
-            FileWriter fw = new FileWriter(System.getProperty("user.dir") + "/info_cost_wtime/info_cost_wtime.txt");
+            if (dataset.equals("hsm")) {
+                file = System.getProperty("user.dir") + "/HSM/info_cost_wtime.txt";
+            }
+            if (dataset.equals("syn")) {
+                file = System.getProperty("user.dir") + "/SYN/info_cost_wtime.txt";
+            }
+            FileWriter fw = new FileWriter(file);
             fw.write(result);
             fw.flush();
             fw.close();
@@ -43,8 +49,14 @@ public class AssignWtimeCost {
         }
     }
 
-    public void assignWtimeCost_read() throws IOException {
-        Path path = Paths.get(fileInput);
+    public void assignWtimeCost_read(String dataset) throws IOException {
+        if (dataset.equals("hsm")) {
+            file = System.getProperty("user.dir") + "/HSM/info_cost_wtime.txt";
+        }
+        if (dataset.equals("syn")) {
+            file = System.getProperty("user.dir") + "/SYN/info_cost_wtime.txt";
+        }
+        Path path = Paths.get(file);
         Scanner scanner = new Scanner(path);
 
         while(scanner.hasNextLine()) {
@@ -63,12 +75,15 @@ public class AssignWtimeCost {
     }
 
     public static void main(String[] arg) throws IOException{
-        DataGen dataGen = new DataGen();
-        dataGen.genAllData(DataGenConstant.dataType, DataGenConstant.divisionType);
+//        DataGen dataGen = new DataGen();
+//        dataGen.genAllData(DataGenConstant.dataType, DataGenConstant.divisionType);
+
+        HSMDataGenRead hsmDataGenRead = new HSMDataGenRead();
+        hsmDataGenRead.dataGen("hsm");
 
         AssignWtimeCost assignWtimeCost = new AssignWtimeCost();
-        assignWtimeCost.assignWtimeCost_save();
-//        assignWtimeCost.assignWtimeCost_read();
+        assignWtimeCost.assignWtimeCost_save("hsm");
+//        assignWtimeCost.assignWtimeCost_read("hsm");
         for (Partition par: IndoorSpace.iPartitions) {
             System.out.println("parId: " + par.getmID() + "; cost: " + par.getStaticCost() + "; wtime: " + par.getWaitTime());
         }
