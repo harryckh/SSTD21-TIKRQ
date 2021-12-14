@@ -100,6 +100,7 @@ public class AlgAdaptKoE {
 				} else {
 					Door dk = IndoorSpace.iDoors.get(dkId);
 					subPath = CommonFunction.findFastestPathD2P(dk, tPoint, partition, tPartition, costMax-curTimeCost);
+					if (subPath != null && !subPath.equals("no route"))
 					d2dPath.put(dkId + "-" + pt + "-" + parId, subPath);
 				}
 

@@ -268,9 +268,9 @@ public class AlgExtension {
 		resultNew = algoExt.resultUpdateCaseF(algo, sPoint, tPoint, QW, costMax, scorMin, k, QWNew); // caseF
 
 		long endTime1 = System.currentTimeMillis();
+		long time1 = endTime1 - startTime1;
 		long endMem1 = runtime1.totalMemory() - runtime1.freeMemory();
 		long mem1 = (endMem1 - startMem1) / 1024 / 1024;
-		long time1 = endTime1 - startTime1;
 		// ----
 
 		System.out.println("result--------------");
@@ -282,21 +282,28 @@ public class AlgExtension {
 			System.out.println(path);
 		}
 
+		System.out.println("timeNew(ms): " + time1 + "; mem(mb): " + mem1);
 		// ------------------------------
 		// for comparsion and correctness check, we can run a query from stratch
 		// but, the result could be different as ParSet ordering are different
 		ArrayList<String> resultCompare = new ArrayList<>();
 		AlgSSA algo1 = new AlgSSA();
+
+		startTime1 = System.currentTimeMillis();
 //		resultCompare = algo1.tikrq(sPoint, tPoint, QW, costMaxNew, scorMin, k); // caseC
 		resultCompare = algo1.tikrq(sPoint, tPoint, QWNew, costMax, scorMin, k); // caseF
+		
+		 endTime1 = System.currentTimeMillis();
+		 time1 = endTime1 - startTime1;
+
 		System.out.println("resultCompare--------------");
 		for (String path : resultCompare) {
 			System.out.println(path);
 		}
-
+		System.out.println("timeCompare(ms): " + time1 + "; mem(mb): " + mem1);
+		
 		// ------------------------------
 
-		System.out.println("time(ms): " + time1 + "; mem(mb): " + mem1);
 
 	}
 
@@ -312,16 +319,21 @@ public class AlgExtension {
 		Point sPoint = new Point(430.0, 2500.0, 3);
 		Point tPoint = new Point(1200, 2400, 4);
 		ArrayList<String> QW = new ArrayList<>(Arrays.asList("-779", "-1113", "-1109", "-810"));
+//		ArrayList<String> QW = new ArrayList<>(Arrays.asList("-779", "-1113"));
+
 		double costMax = 5000;
 		double scorMin = 0.5;
 		int k = 7;
 		result = algo.tikrq(sPoint, tPoint, QW, costMax, scorMin, k);
 		// ----
 
+		System.out.println("-------------------");
+		
 		AlgExtension algoExt = new AlgExtension();
 		double costMaxNew = 4500;
 		ArrayList<String> QWNew = new ArrayList<>(Arrays.asList("-779", "-1113", "-810"));
-
+//		ArrayList<String> QWNew = new ArrayList<>(Arrays.asList("-779"));
+		
 		Runtime runtime1 = Runtime.getRuntime();
 		runtime1.gc();
 		long startMem1 = runtime1.totalMemory() - runtime1.freeMemory();
@@ -331,8 +343,8 @@ public class AlgExtension {
 //		System.out.println("remainFlag " + algo.ckpRemainFlag);
 
 		// parameter changed and run result update
-		resultNew = algoExt.resultUpdateCaseC(algo, sPoint, tPoint, QW, costMax, scorMin, k, costMaxNew); // caseC
-//		resultNew = algoExt.resultUpdateCaseF(algo, sPoint, tPoint, QW, costMax, scorMin, k, QWNew); // caseF
+//		resultNew = algoExt.resultUpdateCaseC(algo, sPoint, tPoint, QW, costMax, scorMin, k, costMaxNew); // caseC
+		resultNew = algoExt.resultUpdateCaseF(algo, sPoint, tPoint, QW, costMax, scorMin, k, QWNew); // caseF
 
 		long endTime1 = System.currentTimeMillis();
 		long endMem1 = runtime1.totalMemory() - runtime1.freeMemory();
@@ -348,14 +360,22 @@ public class AlgExtension {
 		for (String path : resultNew) {
 			System.out.println(path);
 		}
+		System.out.println("time(ms): " + time1 + "; mem(mb): " + mem1);
 
 		// ------------------------------
 		// for comparsion and correctness check, we can run a query from stratch
 		// but, the result could be different as ParSet ordering are different
 		ArrayList<String> resultCompare = new ArrayList<>();
 		AlgSSA algo1 = new AlgSSA();
-		resultCompare = algo1.tikrq(sPoint, tPoint, QW, costMaxNew, scorMin, k); // caseC
-//		resultCompare = algo1.tikrq(sPoint, tPoint, QWNew, costMax, scorMin, k); // caseF
+		startTime1 = System.currentTimeMillis();
+
+		 
+//		resultCompare = algo1.tikrq(sPoint, tPoint, QW, costMaxNew, scorMin, k); // caseC
+		resultCompare = algo1.tikrq(sPoint, tPoint, QWNew, costMax, scorMin, k); // caseF
+		
+		endTime1 = System.currentTimeMillis();
+		time1 = endTime1 - startTime1;
+
 		System.out.println("resultCompare--------------");
 		for (String path : resultCompare) {
 			System.out.println(path);

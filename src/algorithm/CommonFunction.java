@@ -693,11 +693,12 @@ public class CommonFunction {
 //            System.out.println(di);
 			double time_di = Double.parseDouble(str[0]);
 			if (time_di == Constant.large || time_di>timeBudget) {
+//				System.out.println(time_di + " "  + timeBudget);
 				return "no route";
 
 			}
 
-//			System.out.println("dequeue <" + di + ", " + dist_di + ">");
+//			System.out.println("dequeue <" + di + ", " + time_di + ">");
 
 			visited[di] = true;
 //			System.out.println("d" + di + " is newly visited");
@@ -739,8 +740,8 @@ public class CommonFunction {
 				int v = parts.get(i); // partition id
 				if (di != sDoor.getmID() && prev.get(di).get(0) == v)
 					continue;
-				if (di == sDoor.getmID() && v != sPartition.getmID())
-					continue;
+//				if (di == sDoor.getmID() && v != sPartition.getmID())
+//					continue;
 				Partition partition = IndoorSpace.iPartitions.get(v);
 
 				doorTemp = partition.getmDoors();
