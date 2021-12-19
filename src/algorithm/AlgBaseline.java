@@ -21,9 +21,14 @@ public class AlgBaseline {
 
 	private double curKCost;
 
-	// SSA\P
 	public ArrayList<String> baseline(Point sPoint, Point tPoint, ArrayList<String> QW, //
 			double costMax, double scorMin, int k) throws IOException {
+		return baseline(sPoint, tPoint, QW, costMax, scorMin, k, 0);
+	}
+
+	// SSA\P
+	public ArrayList<String> baseline(Point sPoint, Point tPoint, ArrayList<String> QW, //
+			double costMax, double scorMin, int k, int orderedQW) throws IOException {
 		// initialize...
 //		d2dPath = new HashMap<>();
 //		infeasibleParSets = new HashSet<>();
@@ -31,7 +36,9 @@ public class AlgBaseline {
 		PriorityQueue<ParSet> result = new PriorityQueue<ParSet>(Comparator.reverseOrder());
 
 		Partition sPartition = CommonFunction.locPartition(sPoint);
-		Partition tPartition = CommonFunction.locPartition(tPoint);
+		Partition tPartition = null;
+		if (tPoint != null)
+			tPartition = CommonFunction.locPartition(tPoint);
 
 		// Step 1. (Candidate Key Partitions Finding)
 		// find all key partitions
@@ -57,7 +64,7 @@ public class AlgBaseline {
 			parSet.setPar(curPar, pos);
 //			System.out.println("----- i:"+ i+ " " + parSet.toString() + " -------");
 			findKeyParsSets3(canPars_new, parSet, 0, //
-					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, result, k, pos);
+					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, result, k, pos, orderedQW);
 			canPars_new.get(pos).add(curPar);
 
 		}
@@ -75,7 +82,7 @@ public class AlgBaseline {
 	// find all key partition sets
 	private void findKeyParsSets3(ArrayList<ArrayList<ArrayList<String>>> canPars_all, ParSet parSet, int depth,
 			double wTimeMax, double costMax, Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
-			PriorityQueue<ParSet> result, int k, int pos) {
+			PriorityQueue<ParSet> result, int k, int pos, int orderedQW) {
 
 //		System.out.println("findKeyParsSets3 " + depth + " " + Arrays.toString(parSet.getParSet()));
 		// --
@@ -94,8 +101,8 @@ public class AlgBaseline {
 			// Step 3. (Feasible Route Finding)
 
 //	        System.out.println("findFeasiblePath--------");
-			String feasiblePath = findFeasiblePath2(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(),
-					costMax);
+			String feasiblePath = findFeasiblePath2(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(), costMax,
+					orderedQW);
 			if (feasiblePath != null && feasiblePath != "") {
 //				System.out.println("feasiblePath:" + parSet.toString() + " " + feasiblePath);
 				ParSet pSet = new ParSet(parSet);
@@ -113,7 +120,7 @@ public class AlgBaseline {
 
 			if (depth == pos) {
 				findKeyParsSets3(canPars_all, parSet, depth + 1, wTimeMax, costMax, sPoint, tPoint, sPartition,
-						tPartition, result, k, pos);
+						tPartition, result, k, pos, orderedQW);
 			} else {
 				// recursive case
 				// for each partition in this depth
@@ -128,7 +135,7 @@ public class AlgBaseline {
 //System.out.println(costLB + " " + costLB2);
 //					if (costLB < curKCost) {
 					findKeyParsSets3(canPars_all, parSet, depth + 1, wTimeMax, costMax, sPoint, tPoint, sPartition,
-							tPartition, result, k, pos);
+							tPartition, result, k, pos, orderedQW);
 //					} else {
 ////					System.out.println("costLB2<curKcost "+ costLB2 + " " + Arrays.toString( parSet.getParSet()));
 //						parSet.removePar(depth);
@@ -144,18 +151,20 @@ public class AlgBaseline {
 
 	// find feasible path for a partition set
 	private String findFeasiblePath2(Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
-			short[] parSet, double costMax) {
+			short[] parSet, double costMax, int orderedQW) {
 		String result = "";
 //		cntFindFeasiblePath++;
 		int ps = -1;
 		int pt = -2;
 
-		if (sPoint.equals(tPoint)) {
-			return sPoint.eDist(tPoint) + "\t";
-		}
+		if (tPoint != null) {
+			if (sPoint.equals(tPoint)) {
+				return sPoint.eDist(tPoint) + "\t";
+			}
 
-		if (sPartition.getmID() == tPartition.getmID()) {
-			return sPoint.eDist(tPoint) + "\t";
+			if (sPartition.getmID() == tPartition.getmID()) {
+				return sPoint.eDist(tPoint) + "\t";
+			}
 		}
 		// ------------
 
@@ -164,7 +173,7 @@ public class AlgBaseline {
 //		for (ArrayList<String> par : parSet) 
 		for (int i = 0; i < parSet.length; i++) {
 			int parId = parSet[i];
-			if (!(parId == sPartition.getmID() || parId == tPartition.getmID()))
+			if (!(parId == sPartition.getmID() || (tPartition!=null && parId == tPartition.getmID())))
 				if (parId != -1)
 					parList.add(parId);
 		}
@@ -199,21 +208,24 @@ public class AlgBaseline {
 
 			// if the size of the set is 0
 			if (parList_notVisited.size() == 0) {
-				String subPath;
-				if (parId == sPartition.getmID()) {
-					subPath = CommonFunction.findFastestPathP2P(sPoint, tPoint, sPartition, tPartition,
-							costMax - curTimeCost);
+				String[] subPathArr = null;
+				double timeCost_last = 0;
+				if (tPoint != null) {
+					String subPath;
+					if (parId == sPartition.getmID()) {
+						subPath = CommonFunction.findFastestPathP2P(sPoint, tPoint, sPartition, tPartition,
+								costMax - curTimeCost);
 
-				} else {
-					Door dk = IndoorSpace.iDoors.get(dkId);
-					subPath = CommonFunction.findFastestPathD2P(dk, tPoint, partition, tPartition,
-							costMax - curTimeCost);
+					} else {
+						Door dk = IndoorSpace.iDoors.get(dkId);
+						subPath = CommonFunction.findFastestPathD2P(dk, tPoint, partition, tPartition,
+								costMax - curTimeCost);
+					}
+					if (subPath.equals("no route"))
+						continue;
+					subPathArr = subPath.split("\t");
+					timeCost_last = Double.parseDouble(subPathArr[0]);
 				}
-				if (subPath.equals("no route"))
-					continue;
-				String[] subPathArr = subPath.split("\t");
-				double timeCost_last = Double.parseDouble(subPathArr[0]);
-
 //				p2pDist.put(parId+ "-" + pt, timeCost_last);
 
 				double timeCost = curTimeCost + timeCost_last;
@@ -222,8 +234,10 @@ public class AlgBaseline {
 					for (int i = 1; i < curPathArr.length; i++) {
 						finalPath += curPathArr[i] + "\t";
 					}
-					for (int i = 2; i < subPathArr.length - 1; i++) {
-						finalPath += subPathArr[i] + "\t";
+					if (tPoint != null) {
+						for (int i = 2; i < subPathArr.length - 1; i++) {
+							finalPath += subPathArr[i] + "\t";
+						}
 					}
 					finalPath += pt + "";
 					result = timeCost + "\t" + finalPath;
@@ -261,6 +275,9 @@ public class AlgBaseline {
 					remainingDoors.add(door_next);
 //					}
 				}
+
+				if (orderedQW == 1)
+					break;
 			}
 			// --------------------------------------------------------------
 			HashMap<String, String> d2dPath = new HashMap<>();
@@ -325,8 +342,8 @@ public class AlgBaseline {
 					// --
 //					p2pDist.put(parId+ "-" + parId_next, timeCost_next);
 					// --
-					double timeCost_last = CommonFunction.calLowerBoundP2P(door_next, tPoint)
-							/ DataGenConstant.traveling_speed;
+//					double timeCost_last = CommonFunction.calLowerBoundP2P(door_next, tPoint)
+//							/ DataGenConstant.traveling_speed;
 //                    System.out.println("time_last: " + timeCost_last + "  " + costMax);
 //					double timeCostLB = curTimeCost + timeCost_next + timeCost_last;
 //					if (timeCostLB < costMax)
@@ -366,6 +383,9 @@ public class AlgBaseline {
 ////					System.out.println("Adding to inPS: " +s);
 //					break; // since this partial route must be infeasible
 //				}
+
+				if (orderedQW == 1)
+					break;
 			} // end for each unvisited partition
 		} /// end while loop
 		return result;
@@ -402,7 +422,7 @@ public class AlgBaseline {
 //		result = algo.baseline(new Point(1259.0, 1258.0, 3), new Point(611.0, 862.0, 3), //
 //				new ArrayList<>(Arrays.asList("390", "-1059", "-318", "7560", "5587")), //
 //				5000, 0.5, 7);
-		result = algo.baseline(new Point(170.0, 621.0, 3), new Point(1074.0, 889.0, 4), //
+		result = algo.baseline(new Point(170.0, 621.0, 3), null, //
 				new ArrayList<>(Arrays.asList("-1053", "-131", "-574", "-811")), //
 				5000, 0.5, 7);
 

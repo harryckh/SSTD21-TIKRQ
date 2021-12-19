@@ -266,18 +266,19 @@ public class QueryGen {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 
-		Init.init();
+//		Init.init();
+		Init.init_HSM();
 //		for(Door door:IndoorSpace.iDoors) {
 //			System.out.println( door.toString());
 //		}
 		int set = 1;
-		for (int j = 1; j <= 1; j = j + 1) {
-			random.setSeed(2);
+		for (int j = 5; j <= 5; j = j + 1) {
+			random.setSeed(10);
 			System.out.println("generating query set " + (set++));
 			/* parameter setting */
-			String fileName = "test" + ".txt";
+			String fileName = "rq" + j + ".txt";
 			int numOfQueries = 10;
-			int q_word = 4;
+			int q_word = j;
 			double c, i, t;
 //			t = j/10.0;
 //			c = (10.0-j)/20.0;

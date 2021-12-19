@@ -32,6 +32,11 @@ public class AlgAdaptKoE {
 
 	public ArrayList<String> KoE(Point sPoint, Point tPoint, ArrayList<String> QW, //
 			double costMax, int k) throws IOException {
+		return KoE(sPoint, tPoint, QW, costMax, k, 0);
+	}
+
+	public ArrayList<String> KoE(Point sPoint, Point tPoint, ArrayList<String> QW, //
+			double costMax, int k, int orderedQW) throws IOException {
 
 		int ps = -1;
 		int pt = -2;
@@ -42,7 +47,10 @@ public class AlgAdaptKoE {
 		PriorityQueue<ParSet> result = new PriorityQueue<ParSet>(Comparator.reverseOrder());
 
 		Partition sPartition = CommonFunction.locPartition(sPoint);
-		Partition tPartition = CommonFunction.locPartition(tPoint);
+
+		Partition tPartition = null;
+		if (tPoint != null)
+			tPartition = CommonFunction.locPartition(tPoint);
 
 		// Step 1. (Candidate Key Partitions Finding)
 		// find all key partitions
@@ -51,7 +59,10 @@ public class AlgAdaptKoE {
 
 		ArrayList<ArrayList<ArrayList<String>>> canPars_all = candidatePartitions.findAllCandPars();
 
-		double wTimeMax = calWTimeMax(sPoint, tPoint, sPartition, tPartition, costMax);
+		double wTimeMax = costMax;
+		if (tPoint != null)
+			wTimeMax = calWTimeMax(sPoint, tPoint, sPartition, tPartition, costMax);
+
 		curKCost = Constant.large;
 
 		// ---
@@ -94,20 +105,24 @@ public class AlgAdaptKoE {
 
 			if (si.parList.size() == 0) {
 				// connect to pt
-				String subPath = "";
-				if (d2dPath.get(dkId + "-" + pt + "-" + parId) != null) {
-					subPath = d2dPath.get(dkId + "-" + pt + "-" + parId);
-				} else {
-					Door dk = IndoorSpace.iDoors.get(dkId);
-					subPath = CommonFunction.findFastestPathD2P(dk, tPoint, partition, tPartition, costMax-curTimeCost);
-					if (subPath != null && !subPath.equals("no route"))
-					d2dPath.put(dkId + "-" + pt + "-" + parId, subPath);
+				String[] subPathArr = null;
+				double timeCost_last = 0;
+				if (tPoint != null) {
+					String subPath = "";
+					if (d2dPath.get(dkId + "-" + pt + "-" + parId) != null) {
+						subPath = d2dPath.get(dkId + "-" + pt + "-" + parId);
+					} else {
+						Door dk = IndoorSpace.iDoors.get(dkId);
+						subPath = CommonFunction.findFastestPathD2P(dk, tPoint, partition, tPartition,
+								costMax - curTimeCost);
+						if (subPath != null && !subPath.equals("no route"))
+							d2dPath.put(dkId + "-" + pt + "-" + parId, subPath);
+					}
+					if (subPath.equals("no route"))
+						continue;
+					subPathArr = subPath.split("\t");
+					timeCost_last = Double.parseDouble(subPathArr[0]);
 				}
-
-				if (subPath.equals("no route"))
-					continue;
-				String[] subPathArr = subPath.split("\t");
-				double timeCost_last = Double.parseDouble(subPathArr[0]);
 
 				double timeCost = curTimeCost + timeCost_last;
 				if (timeCost < costMax) {
@@ -115,8 +130,10 @@ public class AlgAdaptKoE {
 					for (int i = 1; i < curPathArr.length; i++) {
 						finalPath += curPathArr[i] + "\t";
 					}
-					for (int i = 2; i < subPathArr.length - 1; i++) {
-						finalPath += subPathArr[i] + "\t";
+					if (tPoint != null) {
+						for (int i = 2; i < subPathArr.length - 1; i++) {
+							finalPath += subPathArr[i] + "\t";
+						}
 					}
 					finalPath += "-2" + "";
 					ParSet parSet2 = new ParSet(si.parSet);
@@ -152,6 +169,13 @@ public class AlgAdaptKoE {
 			for (int i = 0; i < canPars_all.size(); i++) {
 				if (parSet.getPar(i) != -1)
 					continue;// already covered
+
+				// ---
+				if (orderedQW == 1 && !allPrevVisited(parSet.getParSet(), i)) {
+					continue;
+				}
+				// ---
+
 				ArrayList<ArrayList<String>> candPars = canPars_all.get(i);
 				for (ArrayList<String> candPar : candPars) {
 
@@ -189,17 +213,24 @@ public class AlgAdaptKoE {
 			// --------------------------------------------------
 			// perform the batch path finding
 			if (parId == sPartition.getmID()) {
-				CommonFunction.findFastestPathsP2D(sPoint, remainingDoors, sPartition, d2dPath, costMax-curTimeCost);
+				CommonFunction.findFastestPathsP2D(sPoint, remainingDoors, sPartition, d2dPath, costMax - curTimeCost);
 			} else {
 //					System.out.println("---dkid:" + dkId + " " + partition.getmID()+ " ---  " + remainingDoors.toString());
 				Door dk = IndoorSpace.iDoors.get(dkId);
-				CommonFunction.findFastestPathsD2D(dk, remainingDoors, partition, d2dPath, costMax-curTimeCost);
+				CommonFunction.findFastestPathsD2D(dk, remainingDoors, partition, d2dPath, costMax - curTimeCost);
 			}
 			// --------------------------------------------------
 			// for each keyword that are not covered
 			for (int i = 0; i < canPars_all.size(); i++) {
 				if (parSet.getPar(i) != -1)
 					continue;// already covered
+
+				// ---
+				if (orderedQW == 1 && !allPrevVisited(parSet.getParSet(), i)) {
+					continue;
+				}
+				// ---
+
 				ArrayList<ArrayList<String>> candPars = canPars_all.get(i);
 				for (ArrayList<String> candPar : candPars) {
 
@@ -228,14 +259,14 @@ public class AlgAdaptKoE {
 						Door door_next = IndoorSpace.iDoors.get(doorId_next);
 						String subPath = "";
 						if (parId == sPartition.getmID())
-						subPath = d2dPath.get(ps + "-" + doorId_next + "-" + parId);
-						
+							subPath = d2dPath.get(ps + "-" + doorId_next + "-" + parId);
+
 						else {
 							subPath = d2dPath.get(dkId + "-" + doorId_next + "-" + parId);
 						}
 
 						// System.out.println("subPath:" + subPath);
-						if (subPath==null|| subPath.equals("no route")) {
+						if (subPath == null || subPath.equals("no route")) {
 //							System.out.println("no route");
 							continue;
 						}
@@ -248,8 +279,10 @@ public class AlgAdaptKoE {
 							continue;
 						}
 						double timeCost_next = Double.parseDouble(subPathArr[0]);
-						double timeCost_last = CommonFunction.calLowerBoundP2P(door_next, tPoint)
-								/ DataGenConstant.traveling_speed;
+						double timeCost_last = 0;
+						if (tPoint != null)
+							timeCost_last = CommonFunction.calLowerBoundP2P(door_next, tPoint)
+									/ DataGenConstant.traveling_speed;
 //                    System.out.println("time_last: " + timeCost_last + "  " + costMax);
 						double timeCostLB = curTimeCost + timeCost_next + timeCost_last + par_next.getWaitTime();
 						if (timeCostLB < costMax) {
@@ -261,7 +294,7 @@ public class AlgAdaptKoE {
 							for (int k1 = 2; k1 < subPathArr.length; k1++) {
 								newPath += subPathArr[k1] + "\t";
 							}
-							double timeCost = curTimeCost + timeCost_next+ par_next.getWaitTime() ;
+							double timeCost = curTimeCost + timeCost_next + par_next.getWaitTime();
 							newPath = timeCost + "\t" + newPath;
 							// create new stamp
 							Stamp sNew = new Stamp(si);
@@ -304,6 +337,18 @@ public class AlgAdaptKoE {
 		return r;
 	}
 
+	// return true only if all [0,i-1] are not -1
+	private boolean allPrevVisited(short[] parSet, int i) {
+		// TODO Auto-generated method stub
+
+		for (int j = 0; j < i; j++) {
+			if (parSet[j] == -1)// this is not visited yet
+				return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * 
 	 * @param result
@@ -323,7 +368,6 @@ public class AlgAdaptKoE {
 		}
 		return true;
 	}
-
 
 	// calculate the max wait time
 	private double calWTimeMax(Point ps, Point pt, Partition sPartition, Partition tPartition, double costMax) {
@@ -447,8 +491,9 @@ public class AlgAdaptKoE {
 
 	private static void testRun() throws Exception {
 		// TODO Auto-generated method stub
-		Init.init();
-
+//		Init.init();
+		Init.init_HSM();
+		
 		AlgAdaptKoE algo_adapt = new AlgAdaptKoE();
 
 		ArrayList<String> result = new ArrayList<>();
@@ -469,10 +514,13 @@ public class AlgAdaptKoE {
 //		result = algo_adapt.KoE(new Point(1299.0, 1127.0, 1), new Point(113.0, 153.0, 4), //
 //				new ArrayList<>(Arrays.asList("3192", "3166", "-78", "-47")), //
 //				5000, 7);
-		result = algo_adapt.KoE(new Point(238.0, 415.0, 4), new Point(1164.0, 354.0, 4), //
-				new ArrayList<>(Arrays.asList("2871", "-701", "787", "bags", "-1195")), //
-				2400,  7);
-	
+//		result = algo_adapt.KoE(new Point(238.0, 415.0, 4), new Point(1164.0, 354.0, 4), //
+//				new ArrayList<>(Arrays.asList("2871", "-701", "787")), //
+//				2400,  7);
+		result = algo_adapt.KoE(new Point(70.0, 55.0, 1), new Point(53.0, 106.0, 1), //
+				new ArrayList<>(Arrays.asList("3805", "-197", "-778", "-551")), //
+				3500, 1, 1);
+
 		long endTime1 = System.currentTimeMillis();
 		long endMem1 = runtime1.totalMemory() - runtime1.freeMemory();
 		long mem1 = (endMem1 - startMem1) / 1024 / 1024;

@@ -13,6 +13,8 @@ public class Query {
 	public double relThreshold;
 	public int k;
 
+	public double timeMaxNew;
+
 	public Query(String[] tempArr) {
 		// TODO Auto-generated constructor stub
 		read(tempArr);
@@ -29,11 +31,10 @@ public class Query {
 
 	@Override
 	public String toString() {
-		return "(" + ps.getX() + "," + ps.getY() + "," + ps.getmFloor()  //
-		+ "), (" + pt.getX() + "," + pt.getY() + "," + pt.getmFloor() //
-		+ ") " + q_word + ", timeMax=" + timeMax
-				+ ", threshold=" + relThreshold + ""
-				+ ", k=" + k;
+		return "(" + ps.getX() + "," + ps.getY() + "," + ps.getmFloor() //
+				+ "), (" + pt.getX() + "," + pt.getY() + "," + pt.getmFloor() //
+				+ ") " + q_word + ", timeMax=" + timeMax + ", threshold=" + relThreshold + "" + ", k=" + k
+				+ ", timeMaxNew=" + timeMaxNew;
 	}
 
 	/**
@@ -53,7 +54,9 @@ public class Query {
 			result += s + " ";
 		result += timeMax + " ";
 		result += relThreshold + " ";
-		result += k;
+		result += k + " ";
+
+		result += timeMaxNew;
 
 		return result;
 	}
@@ -63,22 +66,27 @@ public class Query {
 		double psx = Double.parseDouble(a[i++]);
 		double psy = Double.parseDouble(a[i++]);
 		int psf = Integer.parseInt(a[i++]);
-		ps = new Point(psx,psy,psf);
-		
+		ps = new Point(psx, psy, psf);
+
 		double ptx = Double.parseDouble(a[i++]);
 		double pty = Double.parseDouble(a[i++]);
 		int ptf = Integer.parseInt(a[i++]);
-		pt = new Point(ptx,pty,ptf);
-		
+		pt = new Point(ptx, pty, ptf);
+
 		int q_size = Integer.parseInt(a[i++]);
 		q_word = new ArrayList<>();
-		for(int j=0;j<q_size;j++) {
+		for (int j = 0; j < q_size; j++) {
 			q_word.add(a[i++]);
 		}
-		
+
 		timeMax = Double.parseDouble(a[i++]);
 		relThreshold = Double.parseDouble(a[i++]);
 		k = Integer.parseInt(a[i++]);
+
+		if (i <= a.length - 1)
+			timeMaxNew = Double.parseDouble(a[i++]);
+
+		System.out.println(print());
 	}
 
 }

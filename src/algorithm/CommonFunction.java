@@ -184,7 +184,8 @@ public class CommonFunction {
 	}
 
 	// find fastest path: point to point
-	public static String findFastestPathP2P(Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,double timeBudget) {
+	public static String findFastestPathP2P(Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
+			double timeBudget) {
 		String result = "";
 
 		if (sPoint.equals(tPoint)) {
@@ -238,7 +239,7 @@ public class CommonFunction {
 			int di = Integer.parseInt(str[1]);
 //            System.out.println(di);
 			double time_di = Double.parseDouble(str[0]);
-			if (time_di == Constant.large || time_di>timeBudget) {
+			if (time_di == Constant.large || time_di > timeBudget) {
 				return Double.toString(Constant.large) + "\t";
 
 			}
@@ -564,12 +565,12 @@ public class CommonFunction {
 				if (allMinusOne(tDoorsID))
 					return;
 			}
-			/////-------------------
-			///store all key partition that passes through for future
+			///// -------------------
+			/// store all key partition that passes through for future
 //			prev.get(di).get(0) 
 //			int curParId= prev.get(di).get(0) ;
-			
-			/////-----------------
+
+			///// -----------------
 			if (di != ps) {
 				Door door = IndoorSpace.iDoors.get(di);
 
@@ -647,15 +648,17 @@ public class CommonFunction {
 	}
 
 	// find fastest path: door to point
-	public static String findFastestPathD2P(Door sDoor, Point tPoint, Partition sPartition, Partition tPartition, double timeBudget) {
+	public static String findFastestPathD2P(Door sDoor, Point tPoint, Partition sPartition, Partition tPartition,
+			double timeBudget) {
 		String result = "";
 
-		if (tPartition.getmDoors().contains(sDoor.getmID())) {
+		if (tPartition!=null && tPartition.getmDoors().contains(sDoor.getmID())) {
 			return sDoor.eDist(tPoint) + "\t";
 		}
 
 		ArrayList<Integer> tdoors = new ArrayList<Integer>();
 //        edoors = ePartition.getConnectivityTier().getP2DEnter();
+		if(tPartition!=null)
 		tdoors = tPartition.getmDoors();
 
 		int size = IndoorSpace.iDoors.size() + 1;
@@ -692,7 +695,7 @@ public class CommonFunction {
 			int di = Integer.parseInt(str[1]);
 //            System.out.println(di);
 			double time_di = Double.parseDouble(str[0]);
-			if (time_di == Constant.large || time_di>timeBudget) {
+			if (time_di == Constant.large || time_di > timeBudget) {
 //				System.out.println(time_di + " "  + timeBudget);
 				return "no route";
 
@@ -982,7 +985,7 @@ public class CommonFunction {
 					return;
 			}
 
-			//---
+			// ---
 //			for(ArrayList<String> par: canPars_list) {
 //				int parId= Integer.parseInt(par.get(0));
 //				if(di != sDoor.getmID() &&parId==prev.get(di).get(0)) {
@@ -993,7 +996,7 @@ public class CommonFunction {
 //
 //				}
 //			}
-			//---
+			// ---
 			Door door = IndoorSpace.iDoors.get(di);
 
 			ArrayList<Integer> parts = new ArrayList<Integer>(); // list of leavable partitions
@@ -1145,6 +1148,10 @@ public class CommonFunction {
 	}
 
 	public static double calLowerBoundP2P(Point point1, Point point2) {
+
+		if (point1 == null || point2 == null)
+			return 0;
+
 		double result = 0;
 		double minDist = Constant.large;
 		int floorId1 = point1.getmFloor();

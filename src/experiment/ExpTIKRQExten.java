@@ -6,15 +6,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 
 import algorithm.AlgAdaptKoE;
 import algorithm.AlgBaseline;
+import algorithm.AlgExtension;
 import algorithm.AlgSSA;
 import algorithm.Init;
 import indoor_entitity.Point;
 
-public class ExpTIKRQ {
+public class ExpTIKRQExten {
 
 	/**
 	 * 
@@ -32,6 +35,8 @@ public class ExpTIKRQ {
 		// ---
 //		Init.init();
 		AlgSSA algo_cikrq = new AlgSSA();
+		AlgExtension algo_exten = new AlgExtension();
+		AlgSSA algo_stratch = new AlgSSA();
 		AlgBaseline algo_baseline = new AlgBaseline();
 		AlgAdaptKoE algo_Adapt_KoE = new AlgAdaptKoE();
 		// ---
@@ -72,6 +77,13 @@ public class ExpTIKRQ {
 				long resultTimeAve1 = 0;
 				long resultMenAve1 = 0;
 				ArrayList<String> QW = query.q_word;
+
+				// remove the final one
+				ArrayList<String> QWnew = new ArrayList<String>();
+				for (int aa = 0; aa < QW.size() - 1; aa++) {
+					QWnew.add(QW.get(aa));
+				}
+
 				Point ps = query.ps;
 				Point pt = query.pt;
 
@@ -80,6 +92,11 @@ public class ExpTIKRQ {
 				// run 10 times
 //				int times = 10;
 				for (int h = 0; h < numOfRuns; h++) {
+
+					if (alg_opt == 4 || alg_opt == 14) {
+						algo_cikrq.tikrq(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
+					}
+
 					System.out.print(h + " ");
 					Runtime runtime = Runtime.getRuntime();
 					runtime.gc();
@@ -90,8 +107,49 @@ public class ExpTIKRQ {
 					if (alg_opt == 1) {
 						tmp = algo_cikrq.tikrq(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
 					} else if (alg_opt == 2) {
-						tmp = algo_Adapt_KoE.KoE(ps, pt, QW, query.timeMax, query.k);
+						tmp = algo_Adapt_KoE.KoE(ps, pt, QW, query.timeMaxNew, query.k);
 					} else if (alg_opt == 3) {
+						tmp = algo_baseline.baseline(ps, pt, QW, query.timeMaxNew, query.relThreshold, query.k);
+					} else if (alg_opt == 4) {
+						tmp = algo_exten.resultUpdateCaseC(algo_cikrq, ps, pt, QW, query.timeMax, query.relThreshold,
+								query.k, query.timeMaxNew);
+					} else if (alg_opt == 5) {
+						tmp = algo_stratch.tikrq(ps, pt, QW, query.timeMaxNew, query.relThreshold, query.k);
+						// ------------------------------------------------------------------------------------
+					} else if (alg_opt == 11) {
+						tmp = algo_cikrq.tikrq(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 12) {
+						tmp = algo_Adapt_KoE.KoE(ps, pt, QWnew, query.timeMax, query.k);
+					} else if (alg_opt == 13) {
+						tmp = algo_baseline.baseline(ps, pt, QWnew, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 14) {
+						tmp = algo_exten.resultUpdateCaseF(algo_cikrq, ps, pt, QW, query.timeMax, query.relThreshold,
+								query.k, QWnew);
+					} else if (alg_opt == 15) {
+						tmp = algo_stratch.tikrq(ps, pt, QWnew, query.timeMax, query.relThreshold, query.k);
+						// ------------------------------------------------------------------------------------
+
+					} else if (alg_opt == 21) {
+						tmp = algo_cikrq.tikrq(ps, pt, QW, query.timeMax, query.relThreshold, query.k, 1);
+						} else if (alg_opt == 22) {
+							tmp = algo_Adapt_KoE.KoE(ps, pt, QW, query.timeMax, query.k,1);
+						} else if (alg_opt == 23) {
+							tmp = algo_baseline.baseline(ps, pt, QW, query.timeMax, query.relThreshold, query.k,1);
+						// ------------------------------------------------------------------------------------
+
+					} else if (alg_opt == 31) {
+						tmp = algo_cikrq.tikrq(ps, null, QW, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 32) {
+						tmp = algo_Adapt_KoE.KoE(ps, null, QW, query.timeMax, query.k);
+					} else if (alg_opt == 33) {
+						tmp = algo_baseline.baseline(ps, null, QW, query.timeMax, query.relThreshold, query.k);
+						// ------------------------------------------------------------------------------------
+
+					}else if (alg_opt == 41) {
+						tmp = algo_cikrq.tikrq(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 42) {
+						tmp = algo_Adapt_KoE.KoE(ps, pt, QW, query.timeMax, query.k);
+					} else if (alg_opt == 43) {
 						tmp = algo_baseline.baseline(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
 					}
 
@@ -162,26 +220,76 @@ public class ExpTIKRQ {
 		runtime.gc();
 		long start = System.nanoTime();
 
-		Init.init();
-
+//		Init.init();
+		Init.init_HSM();
+		
 		ArrayList<String> fileNameList = new ArrayList<>();
+		
+//		fileNameList.add("3000.txt");
+//		fileNameList.add("3100.txt");
+//		fileNameList.add("3200.txt");
+//		fileNameList.add("3300.txt");
+//		fileNameList.add("3400.txt");
+		
+//		fileNameList.add("rk7.txt");
+//		fileNameList.add("rk9.txt");
+//		fileNameList.add("rk11.txt");
+//
+//		ArrayList<ArrayList<Query>> qListList = new ArrayList<>();
+//		for (String fileName : fileNameList)
+//			qListList.add(readQuery("/query/" + fileName));
+//
+////		exp("sc4", qListList, 4, 1);
+////		exp("sc5", qListList, 5, 1);
+//
+//		exp("rk43", qListList, 3, 10);
+		// ==============================================
 
-		fileNameList.add("k1.txt");
-		fileNameList.add("k3.txt");
-		fileNameList.add("k5.txt");
-		fileNameList.add("k7.txt");
-		fileNameList.add("k9.txt");
-		fileNameList.add("k11.txt");
+		ArrayList<String> fileNameList2 = new ArrayList<>();
 
-		ArrayList<ArrayList<Query>> qListList = new ArrayList<>();
-		for (String fileName : fileNameList)
-			qListList.add(readQuery("/query/" + fileName));
+//		fileNameList2.add("rk1.txt");
+//		fileNameList2.add("rk3.txt");
+//		fileNameList2.add("rk5.txt");
+//		fileNameList2.add("rk7.txt");
+//		fileNameList2.add("rk9.txt");
+//		fileNameList2.add("rk11.txt");
+//
+		fileNameList2.add("rq1.txt");
+		fileNameList2.add("rq2.txt");
+		fileNameList2.add("rq3.txt");
+		fileNameList2.add("rq4.txt");
+		fileNameList2.add("rq5.txt");
 
-//		exp("q41", qListList, 1, 10);
-//		exp("q42", qListList, 2, 1);
-		exp("q43", qListList, 3, 1);
+		ArrayList<ArrayList<Query>> qListList2 = new ArrayList<>();
+		for (String fileName : fileNameList2)
+			qListList2.add(readQuery("/query/" + fileName));
 
-
+//		exp("rq41", qListList2, 41, 10);
+//		exp("rq42", qListList2, 42, 10);
+		exp("rq43", qListList2, 43, 1);
+		
+		exp("rk21", qListList2, 21, 1);
+		exp("rq31", qListList2, 31, 1);
+		exp("rq22", qListList2, 22, 1);
+		exp("rq32", qListList2, 32, 1);
+		exp("rq23", qListList2, 23, 1);
+		exp("rq33", qListList2, 33, 1);
+		
+//		exp("rk21", qListList2, 21, 10);
+//		exp("rk31", qListList2, 31, 10);
+//		exp("rk22", qListList2, 22, 10);
+//		exp("rk32", qListList2, 32, 10);
+//		exp("rk23", qListList2, 23, 10);
+//		exp("rk33", qListList2, 33, 10);
+//		
+//		exp("rk41", qListList2, 1, 10);
+//		exp("rk42", qListList2, 2, 10);
+//		exp("rk43", qListList2, 3, 10);
+		
+		
+		//2x = ordered
+		//3x = no end point
+		
 		long end = System.nanoTime();
 
 		long time = end - start;

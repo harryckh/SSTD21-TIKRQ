@@ -78,12 +78,12 @@ public class DataGenConstant {
 	public static double traveling_speed = 1 * 83.34 / 60;
 //	public static double traveling_speed = 1.4;
 
-	public static void init(String dataName) {
+	public static void init(String dataName, double scale) {
 
 		if (dataName.equals("hsm")) {
 			dataset = "hsm";
-			floorRangeX = 2100;
-			floorRangeY = 2700;
+			floorRangeX = 2100/scale;
+			floorRangeY = 2700/scale;
 			zoomLevel = 0.28;
 			nFloor = 7;
 			exitDoors = new ArrayList<>(Arrays.asList(1, 5, 9, 10, 233, 617, 619, 620, 622, 626));

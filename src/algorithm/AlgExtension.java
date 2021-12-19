@@ -77,7 +77,7 @@ public class AlgExtension {
 			}
 			else {
 				String feasiblePath = algSSA.findFeasiblePath(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(),
-						parSet.getwTime(), costMaxNew, algSSA.canPars_list);
+						parSet.getwTime(), costMaxNew, algSSA.canPars_list,0);
 
 				if (feasiblePath != null && feasiblePath != "") {
 					ParSet pSet = new ParSet(parSet);
@@ -115,7 +115,7 @@ public class AlgExtension {
 			int pos = Integer.parseInt(curPar.get(2));
 			parSet.setPar(curPar, pos);
 			algSSA.findKeyParsSets(canPars_new, parSet, 0, //
-					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, resultNew, k, pos, canPars_list);
+					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, resultNew, k, pos, canPars_list,0);
 			canPars_new.get(pos).add(curPar);
 //			System.out.println("remain: " + (i + 1));
 //			if (resultNew.size() >= k) break;
@@ -242,18 +242,18 @@ public class AlgExtension {
 		ArrayList<String> resultNew = new ArrayList<>();
 
 		// set up and run original query
-		Point sPoint = new Point(170.0, 621.0, 3);
-		Point tPoint = new Point(1074.0, 889.0, 4);
-		ArrayList<String> QW = new ArrayList<>(Arrays.asList("-1053", "-131", "-574", "-811"));
-		double costMax = 5000;
+		Point sPoint = new Point(862.0,632.0,4);
+		Point tPoint = new Point(658.0,361.0,3);
+		ArrayList<String> QW = new ArrayList<>(Arrays.asList("5578", "212", "4179", "2880"));
+		double costMax = 3500;
 		double scorMin = 0.5;
 		int k = 7;
 		result = algo.tikrq(sPoint, tPoint, QW, costMax, scorMin, k);
 		// ----
 
 		AlgExtension algoExt = new AlgExtension();
-		double costMaxNew = 2500;
-		ArrayList<String> QWNew = new ArrayList<>(Arrays.asList("-1053", "-131", "-811"));
+		double costMaxNew = 3325;
+		ArrayList<String> QWNew = new ArrayList<>(Arrays.asList("5578", "212", "4179"));
 
 		Runtime runtime1 = Runtime.getRuntime();
 		runtime1.gc();
@@ -264,8 +264,8 @@ public class AlgExtension {
 //		System.out.println("remainFlag " + algo.ckpRemainFlag);
 
 		// parameter changed and run result update
-//		resultNew = algoExt.resultUpdateCaseC(algo, sPoint, tPoint, QW, costMax, scorMin, k, costMaxNew); // caseC
-		resultNew = algoExt.resultUpdateCaseF(algo, sPoint, tPoint, QW, costMax, scorMin, k, QWNew); // caseF
+		resultNew = algoExt.resultUpdateCaseC(algo, sPoint, tPoint, QW, costMax, scorMin, k, costMaxNew); // caseC
+//		resultNew = algoExt.resultUpdateCaseF(algo, sPoint, tPoint, QW, costMax, scorMin, k, QWNew); // caseF
 
 		long endTime1 = System.currentTimeMillis();
 		long time1 = endTime1 - startTime1;
@@ -290,8 +290,8 @@ public class AlgExtension {
 		AlgSSA algo1 = new AlgSSA();
 
 		startTime1 = System.currentTimeMillis();
-//		resultCompare = algo1.tikrq(sPoint, tPoint, QW, costMaxNew, scorMin, k); // caseC
-		resultCompare = algo1.tikrq(sPoint, tPoint, QWNew, costMax, scorMin, k); // caseF
+		resultCompare = algo1.tikrq(sPoint, tPoint, QW, costMaxNew, scorMin, k); // caseC
+//		resultCompare = algo1.tikrq(sPoint, tPoint, QWNew, costMax, scorMin, k); // caseF
 		
 		 endTime1 = System.currentTimeMillis();
 		 time1 = endTime1 - startTime1;
@@ -316,15 +316,16 @@ public class AlgExtension {
 		ArrayList<String> resultNew = new ArrayList<>();
 
 		// set up and run original query
-		Point sPoint = new Point(430.0, 2500.0, 3);
-		Point tPoint = new Point(1200, 2400, 4);
-		ArrayList<String> QW = new ArrayList<>(Arrays.asList("-779", "-1113", "-1109", "-810"));
-//		ArrayList<String> QW = new ArrayList<>(Arrays.asList("-779", "-1113"));
+		Point sPoint = new Point(17.2, 100.0, 3);
+		Point tPoint = new Point(28.0, 88.0, 4);
+//		ArrayList<String> QW = new ArrayList<>(Arrays.asList("-779", "-1113", "-1109", "-810"));
+		ArrayList<String> QW = new ArrayList<>(Arrays.asList("-779", "-1113"));
 
 		double costMax = 5000;
 		double scorMin = 0.5;
 		int k = 7;
 		result = algo.tikrq(sPoint, tPoint, QW, costMax, scorMin, k);
+
 		// ----
 
 		System.out.println("-------------------");
@@ -343,8 +344,10 @@ public class AlgExtension {
 //		System.out.println("remainFlag " + algo.ckpRemainFlag);
 
 		// parameter changed and run result update
-//		resultNew = algoExt.resultUpdateCaseC(algo, sPoint, tPoint, QW, costMax, scorMin, k, costMaxNew); // caseC
-		resultNew = algoExt.resultUpdateCaseF(algo, sPoint, tPoint, QW, costMax, scorMin, k, QWNew); // caseF
+		resultNew = algoExt.resultUpdateCaseC(algo, sPoint, tPoint, QW, costMax, scorMin, k, costMaxNew); // caseC
+//		resultNew = algoExt.resultUpdateCaseF(algo, sPoint, tPoint, QW, costMax, scorMin, k, QWNew); // caseF
+//		result = algo.tikrq(sPoint, tPoint, QW, costMax, scorMin, k,0);
+
 
 		long endTime1 = System.currentTimeMillis();
 		long endMem1 = runtime1.totalMemory() - runtime1.freeMemory();
@@ -370,8 +373,8 @@ public class AlgExtension {
 		startTime1 = System.currentTimeMillis();
 
 		 
-//		resultCompare = algo1.tikrq(sPoint, tPoint, QW, costMaxNew, scorMin, k); // caseC
-		resultCompare = algo1.tikrq(sPoint, tPoint, QWNew, costMax, scorMin, k); // caseF
+		resultCompare = algo1.tikrq(sPoint, tPoint, QW, costMax, scorMin, k,1); // caseC
+//		resultCompare = algo1.tikrq(sPoint, tPoint, QWNew, costMax, scorMin, k); // caseF
 		
 		endTime1 = System.currentTimeMillis();
 		time1 = endTime1 - startTime1;

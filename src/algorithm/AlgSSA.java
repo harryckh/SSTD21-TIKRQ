@@ -33,7 +33,7 @@ public class AlgSSA {
 	// entrance for backward compatibility
 	public ArrayList<String> tikrq(Point sPoint, Point tPoint, ArrayList<String> QW, //
 			double costMax, double scorMin, int k) throws IOException {
-		return tikrq_variation(sPoint, tPoint, QW, costMax, scorMin, k, 0);
+		return tikrq(sPoint, tPoint, QW, costMax, scorMin, k, 0);
 	}
 
 	// SSA
@@ -43,14 +43,14 @@ public class AlgSSA {
 	 * @param sPoint
 	 * @param tPoint
 	 * @param QW
-	 * @param costMax = Delte_{Max} = max. time allowed !!
-	 * @param scorMin = relevance threshold
-	 * @param k       = number of results
+	 * @param costMax   = Delte_{Max} = max. time allowed !!
+	 * @param scorMin   = relevance threshold
+	 * @param k         = number of results
 	 * @param orderedQW = 1 if the QW need to be visited in order
 	 * @return
 	 * @throws IOException
 	 */
-	public ArrayList<String> tikrq_variation(Point sPoint, Point tPoint, ArrayList<String> QW, //
+	public ArrayList<String> tikrq(Point sPoint, Point tPoint, ArrayList<String> QW, //
 			double costMax, double scorMin, int k, int orderedQW) throws IOException {
 		// initialize
 		d2dPath = new HashMap<>();
@@ -59,12 +59,13 @@ public class AlgSSA {
 		PriorityQueue<ParSet> result = new PriorityQueue<ParSet>(Comparator.reverseOrder());
 
 		Partition sPartition = CommonFunction.locPartition(sPoint);
-		Partition tPartition = CommonFunction.locPartition(tPoint);
+		Partition tPartition = null;
+		if (tPoint != null)
+			tPartition = CommonFunction.locPartition(tPoint);
 
 		// Step 1. (Candidate Key Partitions Finding)
 		// find all key partitions
-		CandidatePartitions candidatePartitions = new CandidatePartitions(QW,
-				DataGenConstant.threshold);
+		CandidatePartitions candidatePartitions = new CandidatePartitions(QW, DataGenConstant.threshold);
 
 		ArrayList<ArrayList<String>> canPars_list = candidatePartitions.findAllCandPars3();
 		// pruning 1
@@ -87,10 +88,10 @@ public class AlgSSA {
 				/// Need to handle \alpha here!
 				Partition parA = IndoorSpace.iPartitions.get(Integer.parseInt(a.get(0)));
 				Partition parB = IndoorSpace.iPartitions.get(Integer.parseInt(b.get(0)));
-				double costA = alpha * (double) parA.getStaticCost() / DataGenConstant.SC_MAX + (1.0
-						- alpha) * (1 - Double.parseDouble(a.get(1)));
-				double costB = alpha * (double) parB.getStaticCost() / DataGenConstant.SC_MAX + (1.0
-						- alpha) * (1 - Double.parseDouble(b.get(1)));
+				double costA = alpha * (double) parA.getStaticCost() / DataGenConstant.SC_MAX
+						+ (1.0 - alpha) * (1 - Double.parseDouble(a.get(1)));
+				double costB = alpha * (double) parB.getStaticCost() / DataGenConstant.SC_MAX
+						+ (1.0 - alpha) * (1 - Double.parseDouble(b.get(1)));
 
 				if (costA > costB)
 					return 1;
@@ -102,7 +103,9 @@ public class AlgSSA {
 
 		});
 
-		double wTimeMax = calWTimeMax(sPoint, tPoint, sPartition, tPartition, costMax);
+		double wTimeMax = costMax;
+		if (tPoint != null)
+			wTimeMax = calWTimeMax(sPoint, tPoint, sPartition, tPartition, costMax);
 
 		curKCost = Constant.large;
 
@@ -124,8 +127,7 @@ public class AlgSSA {
 			parSet.setPar(curPar, pos);
 			// Step 2. iteratore key partition sets
 			findKeyParsSets(canPars_new, parSet, 0, //
-					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, result, k, pos,
-					canPars_list);
+					wTimeMax, costMax, sPoint, tPoint, sPartition, tPartition, result, k, pos, canPars_list, orderedQW);
 			canPars_new.get(pos).add(curPar);
 		}
 
@@ -150,10 +152,9 @@ public class AlgSSA {
 
 	// dynamic approach
 	// find all key partition sets
-	public void findKeyParsSets(ArrayList<ArrayList<ArrayList<String>>> canPars_all, ParSet parSet,
-			int depth, double wTimeMax, double costMax, Point sPoint, Point tPoint,
-			Partition sPartition, Partition tPartition, PriorityQueue<ParSet> result, int k,
-			int pos, ArrayList<ArrayList<String>> canPars_list) {
+	public void findKeyParsSets(ArrayList<ArrayList<ArrayList<String>>> canPars_all, ParSet parSet, int depth,
+			double wTimeMax, double costMax, Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
+			PriorityQueue<ParSet> result, int k, int pos, ArrayList<ArrayList<String>> canPars_list, int orderedQW) {
 
 		if (parSet.getwTime() > wTimeMax)
 			return;
@@ -168,8 +169,8 @@ public class AlgSSA {
 			}
 //			System.out.println("parset info: " + parSet.toString());
 			// Step 3. (Feasible Route Finding)
-			String feasiblePath = findFeasiblePath(sPoint, tPoint, sPartition, tPartition, parSet
-					.getParSet(), parSet.getwTime(), costMax, canPars_list);
+			String feasiblePath = findFeasiblePath(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(),
+					parSet.getwTime(), costMax, canPars_list, orderedQW);
 
 			if (feasiblePath != null && feasiblePath != "") {
 				ParSet pSet = new ParSet(parSet);
@@ -191,8 +192,8 @@ public class AlgSSA {
 		} else {
 			// recursive case
 			if (depth == pos) {
-				findKeyParsSets(canPars_all, parSet, depth + 1, wTimeMax, costMax, sPoint, tPoint,
-						sPartition, tPartition, result, k, pos, canPars_list);
+				findKeyParsSets(canPars_all, parSet, depth + 1, wTimeMax, costMax, sPoint, tPoint, sPartition,
+						tPartition, result, k, pos, canPars_list, orderedQW);
 			} else {
 				// ---------------
 				// for each partition in this depth
@@ -201,8 +202,8 @@ public class AlgSSA {
 					// pruning 2
 					double costLB = parSet.calcTotalCostLB(canPars_all.size());
 					if (costLB < curKCost) {
-						findKeyParsSets(canPars_all, parSet, depth + 1, wTimeMax, costMax, sPoint,
-								tPoint, sPartition, tPartition, result, k, pos, canPars_list);
+						findKeyParsSets(canPars_all, parSet, depth + 1, wTimeMax, costMax, sPoint, tPoint, sPartition,
+								tPartition, result, k, pos, canPars_list, orderedQW);
 					} else {
 						parSet.removePar(depth);
 						break;
@@ -216,8 +217,7 @@ public class AlgSSA {
 	}
 
 	// calculate the max wait time
-	public double calWTimeMax(Point ps, Point pt, Partition sPartition, Partition tPartition,
-			double costMax) {
+	public double calWTimeMax(Point ps, Point pt, Partition sPartition, Partition tPartition, double costMax) {
 		double wTimeMax = 0;
 		String dist_path = CommonFunction.findShortestPath(ps, pt, sPartition, tPartition);
 		double dist = Double.parseDouble(dist_path.split("\t")[0]);
@@ -233,19 +233,19 @@ public class AlgSSA {
 	ArrayList<String> inResultParSet = new ArrayList<>();
 
 	// find feasible path for a partition set
-	public String findFeasiblePath(Point sPoint, Point tPoint, Partition sPartition,
-			Partition tPartition, short[] parSet, double setWaitTime, double costMax,
-			ArrayList<ArrayList<String>> canPars_list) {
+	public String findFeasiblePath(Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
+			short[] parSet, double setWaitTime, double costMax, ArrayList<ArrayList<String>> canPars_list,
+			int orderedQW) {
 		String result = "";
 		cntFindFeasiblePath++;
 		int ps = -1;
 		int pt = -2;
 
-		if (sPoint.equals(tPoint)) {
+		if (tPoint != null && sPoint.equals(tPoint)) {
 			return sPoint.eDist(tPoint) + "\t";
 		}
 
-		if (sPartition.getmID() == tPartition.getmID()) {
+		if (tPartition != null && sPartition.getmID() == tPartition.getmID()) {
 			return sPoint.eDist(tPoint) + "\t";
 		}
 
@@ -256,7 +256,7 @@ public class AlgSSA {
 		for (int i = 0; i < parSet.length; i++) {
 			parSetString += parSet[i];
 			int parId = parSet[i];
-			if (!(parId == sPartition.getmID() || parId == tPartition.getmID()))
+			if (!(parId == sPartition.getmID() || (tPartition != null && parId == tPartition.getmID())))
 				if (parId != -1)
 					parList.add(parId);
 		}
@@ -271,8 +271,7 @@ public class AlgSSA {
 		MinHeap<Stamp> Q = new MinHeap<>("set");
 
 		// initialize stamp
-		Stamp s0 = new Stamp(sPartition.getmID(), setWaitTime, setWaitTime + "\t" + "-1", parList,
-				new ArrayList<>());
+		Stamp s0 = new Stamp(sPartition.getmID(), setWaitTime, setWaitTime + "\t" + "-1", parList, new ArrayList<>());
 		Q.insert(s0);
 
 		while (Q.heapSize > 0) {
@@ -291,53 +290,59 @@ public class AlgSSA {
 
 			// if the size of the set is 0
 			if (parList_notVisited.size() == 0) {
-				String subPath;
-				if (parId == sPartition.getmID()) {
-					subPath = d2dPath.get(ps + "-" + pt + "-" + parId);
-					if (subPath == null) {
-						subPath = CommonFunction.findFastestPathP2P(sPoint, tPoint, sPartition,
-								tPartition, costMax - curTimeCost);
-						if (subPath != null && !subPath.equals("no route"))
-							d2dPath.put(ps + "-" + pt + "-" + parId, subPath);
-					}
+				double timeCost_last = 0;
+				String[] subPathArr = null;
+				if (tPoint != null) {
+					String subPath;
+					if (parId == sPartition.getmID()) {
+						subPath = d2dPath.get(ps + "-" + pt + "-" + parId);
+						if (subPath == null) {
+							subPath = CommonFunction.findFastestPathP2P(sPoint, tPoint, sPartition, tPartition,
+									costMax - curTimeCost);
+							if (subPath != null && !subPath.equals("no route"))
+								d2dPath.put(ps + "-" + pt + "-" + parId, subPath);
+						}
 
-				} else {
-					subPath = d2dPath.get(dkId + "-" + pt + "-" + parId);
-					if (subPath == null) {
+					} else {
+						subPath = d2dPath.get(dkId + "-" + pt + "-" + parId);
+						if (subPath == null) {
 //					if(dkId==710)
 //					System.out.println("Finding subpath: costMax - curTimeCost:" + (costMax - curTimeCost));
-						Door dk = IndoorSpace.iDoors.get(dkId);
-						subPath = CommonFunction.findFastestPathD2P(dk, tPoint, partition,
-								tPartition, costMax - curTimeCost);
-						if (subPath != null && !subPath.equals("no route"))
-							d2dPath.put(dkId + "-" + pt + "-" + parId, subPath);
-						
+							Door dk = IndoorSpace.iDoors.get(dkId);
+							subPath = CommonFunction.findFastestPathD2P(dk, tPoint, partition, tPartition,
+									costMax - curTimeCost);
+							if (subPath != null && !subPath.equals("no route"))
+								d2dPath.put(dkId + "-" + pt + "-" + parId, subPath);
+
+						}
+
 					}
 
-				}
-
-				if (subPath.equals("no route")) {
+					if (subPath.equals("no route")) {
 //					System.out.println("no route");
-					continue;
+						continue;
+					}
+					subPathArr = subPath.split("\t");
+
+					timeCost_last = Double.parseDouble(subPathArr[0]);
 				}
-				String[] subPathArr = subPath.split("\t");
-				double timeCost_last = Double.parseDouble(subPathArr[0]);
 
 				// a feasible path found, return here
 				double timeCost = curTimeCost + timeCost_last;
 
 //				System.out.println("dkId: " + dkId + " pt: " + pt);
 //				System.out.println("timeCost: " + timeCost + " costMax:" + costMax);
-				if (timeCost < costMax) 
-				{
+				if (timeCost < costMax) {
 					String finalPath = "";
 					for (int i = 1; i < curPathArr.length; i++) {
 						finalPath += curPathArr[i] + "\t";
 					}
-					for (int i = 2; i < subPathArr.length - 1; i++) {
-						finalPath += subPathArr[i] + "\t";
+					if (tPoint != null) {
+						for (int i = 2; i < subPathArr.length - 1; i++) {
+							finalPath += subPathArr[i] + "\t";
+						}
+						finalPath += pt + "";
 					}
-					finalPath += pt + "";
 					result = timeCost + " " + finalPath;
 					return result;
 				}
@@ -370,18 +375,19 @@ public class AlgSSA {
 							remainingDoors.add(door_next);
 					}
 				}
+				// only the first one need to be explored
+				if (orderedQW == 1)
+					break;
 			}
 			// --------------------------------------------------------------
 
 			// perform the batch path finding
 			if (parId == sPartition.getmID()) {
-				CommonFunction.findFastestPathsP2D(sPoint, remainingDoors, sPartition, d2dPath,
-						costMax - curTimeCost);
+				CommonFunction.findFastestPathsP2D(sPoint, remainingDoors, sPartition, d2dPath, costMax - curTimeCost);
 			} else {
 //					System.out.println("---dkid:" + dkId + " " + partition.getmID()+ " ---  " + remainingDoors.toString());
 				Door dk = IndoorSpace.iDoors.get(dkId);
-				CommonFunction.findFastestPathsD2D(dk, remainingDoors, partition, d2dPath, costMax
-						- curTimeCost);
+				CommonFunction.findFastestPathsD2D(dk, remainingDoors, partition, d2dPath, costMax - curTimeCost);
 			}
 
 			// --------------------------------------------------------------
@@ -423,16 +429,19 @@ public class AlgSSA {
 
 					String[] subPathArr = subPath.split("\t");
 					// the door before door_next can not be a door if par_next
-					if (subPathArr.length > 4 && CommonFunction.findCommonPar(Integer.parseInt(
-							subPathArr[subPathArr.length - 1]), Integer.parseInt(
-									subPathArr[subPathArr.length - 2])) == parId_next) {
+					if (subPathArr.length > 4
+							&& CommonFunction.findCommonPar(Integer.parseInt(subPathArr[subPathArr.length - 1]),
+									Integer.parseInt(subPathArr[subPathArr.length - 2])) == parId_next) {
 //						System.out.println("skipped subPathArr.length:"+ subPathArr.length);
 
 						continue;
 					}
 					double timeCost_next = Double.parseDouble(subPathArr[0]);
-					double timeCost_last = CommonFunction.calLowerBoundP2P(door_next, tPoint)
-							/ DataGenConstant.traveling_speed;
+					double timeCost_last = 0;
+					if (tPoint != null)
+						timeCost_last = CommonFunction.calLowerBoundP2P(door_next, tPoint)
+								/ DataGenConstant.traveling_speed;
+
 //                    System.out.println("time_last: " + timeCost_last + "  " + costMax);
 					double newTimeCostLB = curTimeCost + timeCost_next + timeCost_last;
 					if (newTimeCostLB < costMax) {
@@ -446,14 +455,13 @@ public class AlgSSA {
 						}
 						double newTimeCost = curTimeCost + timeCost_next;
 						newPath = newTimeCost + "\t" + newPath;
-						ArrayList<Integer> newParList_notVisited = new ArrayList<>(
-								parList_notVisited);
+						ArrayList<Integer> newParList_notVisited = new ArrayList<>(parList_notVisited);
 						newParList_notVisited.remove(parList_notVisited.indexOf(parId_next));
 
 						ArrayList<Integer> newParList_Visited = new ArrayList<>(tempNewList);
 
-						Stamp stamp = new Stamp(parId_next, newTimeCost, newPath,
-								newParList_notVisited, newParList_Visited);
+						Stamp stamp = new Stamp(parId_next, newTimeCost, newPath, newParList_notVisited,
+								newParList_Visited);
 						Q.insert(stamp);
 
 //						System.out.println(" new stamp inserted: " + stamp.toString());
@@ -472,6 +480,10 @@ public class AlgSSA {
 //					System.out.println("Adding to inPS: " +s);
 					break; // since this partial route must be infeasible
 				}
+				// only the first one need to be explored
+				if (orderedQW == 1)
+					break;
+
 			} // end for each unvisited partition
 		} /// end while loop
 		return result;
@@ -611,10 +623,10 @@ public class AlgSSA {
 					double fd2d = partition.getdistMatrix().getDistance(di, dj);
 					;
 					if (fd2d == -1) {
-						int fid1 = IndoorSpace.iPartitions.get(IndoorSpace.iDoors.get(di)
-								.getmPartitions().get(0)).getmFloor();
-						int fid2 = IndoorSpace.iPartitions.get(IndoorSpace.iDoors.get(dj)
-								.getmPartitions().get(0)).getmFloor();
+						int fid1 = IndoorSpace.iPartitions.get(IndoorSpace.iDoors.get(di).getmPartitions().get(0))
+								.getmFloor();
+						int fid2 = IndoorSpace.iPartitions.get(IndoorSpace.iDoors.get(dj).getmPartitions().get(0))
+								.getmFloor();
 						fd2d = DataGenConstant.lenStairway * (Math.abs(fid1 - fid2));
 						// System.out.println("fid1 = " + fid1 + " fid2 = " + fid2 + " fd2d = " +
 						// fd2d);
@@ -641,10 +653,10 @@ public class AlgSSA {
 		return this.canPars_list;
 	}
 
-//	public static void main(String[] args) throws Exception {
-//		// TODO Auto-generated method stub
-//		testRun();
-//	}
+	public static void main(String[] args) throws Exception {
+		// TODO Auto-generated method stub
+		testRun();
+	}
 
 	public static void testRun() throws Exception {
 		Init.init();
@@ -672,9 +684,9 @@ public class AlgSSA {
 //		result =  algo.tikrq(new Point(1259.0, 1258.0, 3), new Point(611.0, 862.0, 3), //
 //				new ArrayList<>(Arrays.asList("390", "-1059", "-318", "7560", "5587")), //
 //				5000, 0.5, 7);
-		result = algo.tikrq(new Point(170.0, 621.0, 3), new Point(1074.0, 889.0, 4), //
-				new ArrayList<>(Arrays.asList("-1053", "-131", "-574", "-811")), //
-				5000, 0.5, 7);
+		result = algo.tikrq(new Point(238.0, 415.0, 4),null, //
+				new ArrayList<>(Arrays.asList("2871", "-701", "787")), //
+				2400, 1, 7,1);
 
 		System.out.println("result--------------");
 		for (String path : result) {

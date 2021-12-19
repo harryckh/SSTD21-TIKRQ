@@ -34,10 +34,12 @@ public class HSMDataGenRead {
         dataGen.drawFloor();
     }
 
+    public static final double scale = 25.0;
+    
     public void dataGen(String dataset) throws IOException {
 
         // load the data generation constants of HSM dataset
-        DataGenConstant.init(dataset);
+        DataGenConstant.init(dataset,scale);
 
         Path path1 = Paths.get(inputRoom);
         Scanner scanner1 = new Scanner(path1);
@@ -47,10 +49,10 @@ public class HSMDataGenRead {
             String[] tempArr = line.split("\t");
             int roomId = Integer.parseInt(tempArr[0]);
 
-            double x1 = Double.parseDouble(tempArr[1]);
-            double y1 = Double.parseDouble(tempArr[3]);
-            double x2 = Double.parseDouble(tempArr[2]);
-            double y2 = Double.parseDouble(tempArr[4]);
+            double x1 = Double.parseDouble(tempArr[1])/scale;
+            double y1 = Double.parseDouble(tempArr[3])/scale;
+            double x2 = Double.parseDouble(tempArr[2])/scale;
+            double y2 = Double.parseDouble(tempArr[4])/scale;
             int floor = Integer.parseInt(tempArr[5]);
             int roomType = Integer.parseInt(tempArr[6]);
 
@@ -85,8 +87,8 @@ public class HSMDataGenRead {
             String[] tempArr = line.split("\t");
             int doorId = Integer.parseInt(tempArr[0]);
 //            System.out.println("doorId: " + doorId);
-            double x = Double.parseDouble(tempArr[1]);
-            double y = Double.parseDouble(tempArr[2]);
+            double x = Double.parseDouble(tempArr[1])/scale;
+            double y = Double.parseDouble(tempArr[2])/scale;
             int floor = Integer.parseInt(tempArr[3]);
             Door door = new Door(x, y);
             ArrayList<Integer> rooms = new ArrayList<>();
