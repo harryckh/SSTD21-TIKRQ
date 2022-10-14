@@ -13,7 +13,10 @@ public class Query {
 	public double relThreshold;
 	public int k;
 
+	// the last one is one of the following
 	public double timeMaxNew;
+	public Point psNew = null;
+	public Point ptNew = null;
 
 	public Query(String[] tempArr) {
 		// TODO Auto-generated constructor stub
@@ -33,8 +36,8 @@ public class Query {
 	public String toString() {
 		return "(" + ps.getX() + "," + ps.getY() + "," + ps.getmFloor() //
 				+ "), (" + pt.getX() + "," + pt.getY() + "," + pt.getmFloor() //
-				+ ") " + q_word + ", timeMax=" + timeMax + ", threshold=" + relThreshold + "" + ", k=" + k
-				+ ", timeMaxNew=" + timeMaxNew;
+				+ ") " + q_word + ", timeMax=" + timeMax + ", threshold=" + relThreshold + ""
+				+ ", k=" + k + ", timeMaxNew=" + timeMaxNew;
 	}
 
 	/**
@@ -56,7 +59,12 @@ public class Query {
 		result += relThreshold + " ";
 		result += k + " ";
 
-		result += timeMaxNew;
+		result += timeMaxNew + " ";
+
+		if (psNew != null)
+			result += psNew.getX() + " " + psNew.getY() + " " + psNew.getmFloor() + " ";
+		if (ptNew != null)
+			result += ptNew.getX() + " " + ptNew.getY() + " " + ptNew.getmFloor() + " ";
 
 		return result;
 	}
@@ -83,8 +91,26 @@ public class Query {
 		relThreshold = Double.parseDouble(a[i++]);
 		k = Integer.parseInt(a[i++]);
 
-		if (i <= a.length - 1)
+		// --------
+		// the same i has multi-purpose
+		if (i <= a.length - 1) {
 			timeMaxNew = Double.parseDouble(a[i++]);
+			// psNew or ptNew
+			if (i <= a.length - 1) {
+				double psxNew = Double.parseDouble(a[i++]);
+				double psyNew = Double.parseDouble(a[i++]);
+				int psfNew = Integer.parseInt(a[i++]);
+				psNew = new Point(psxNew, psyNew, psfNew);
+				if (i <= a.length - 1) {
+
+					double ptxNew = Double.parseDouble(a[i++]);
+					double ptyNew = Double.parseDouble(a[i++]);
+					int ptfNew = Integer.parseInt(a[i++]);
+					ptNew = new Point(ptxNew, ptyNew, ptfNew);
+				}
+			}
+		}
+		// ----------
 
 		System.out.println(print());
 	}

@@ -1,6 +1,9 @@
 package algorithm;
 
+
 import indoor_entitity.Door;
+
+
 
 import indoor_entitity.IndoorSpace;
 import indoor_entitity.Partition;
@@ -17,8 +20,8 @@ import java.util.*;
  * 
  */
 public class AlgSSA {
-	private HashMap<String, String> d2dPath; // storing the fastest path from d1 to d2
-	private HashSet<String> infeasibleParSets; // storing the par set that are infeasible
+	public HashMap<String, String> d2dPath; // storing the fastest path from d1 to d2
+	public HashSet<String> infeasibleParSets; // storing the par set that are infeasible
 
 	public static double alpha = 0.5;
 
@@ -172,6 +175,9 @@ public class AlgSSA {
 			String feasiblePath = findFeasiblePath(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(),
 					parSet.getwTime(), costMax, canPars_list, orderedQW);
 
+		
+//			System.out.println("feasible! path: " + feasiblePath);
+			
 			if (feasiblePath != null && feasiblePath != "") {
 				ParSet pSet = new ParSet(parSet);
 				double timeCost = Double.parseDouble(feasiblePath.split(" ")[0]);
@@ -241,13 +247,6 @@ public class AlgSSA {
 		int ps = -1;
 		int pt = -2;
 
-		if (tPoint != null && sPoint.equals(tPoint)) {
-			return sPoint.eDist(tPoint) + "\t";
-		}
-
-		if (tPartition != null && sPartition.getmID() == tPartition.getmID()) {
-			return sPoint.eDist(tPoint) + "\t";
-		}
 
 		/// initialize parList as partition not visited yet
 		ArrayList<Integer> parList = new ArrayList<>();
@@ -261,19 +260,21 @@ public class AlgSSA {
 					parList.add(parId);
 		}
 
+		
 		// only for extension version
 		if (inResultParSet.contains(parSetString)) {
 //            System.out.println("contains...");
 			return null;
 		}
-
+		
 		// initialize the priority queues
 		MinHeap<Stamp> Q = new MinHeap<>("set");
 
 		// initialize stamp
-		Stamp s0 = new Stamp(sPartition.getmID(), setWaitTime, setWaitTime + "\t" + "-1", parList, new ArrayList<>());
+		Stamp s0 = new Stamp(sPartition.getmID(), 0, setWaitTime + "\t" + "-1", parList, new ArrayList<>());
 		Q.insert(s0);
 
+		
 		while (Q.heapSize > 0) {
 			Stamp si = Q.delete_min();
 
@@ -659,7 +660,8 @@ public class AlgSSA {
 	}
 
 	public static void testRun() throws Exception {
-		Init.init();
+//		Init.init();
+		Init.init_HSM();
 		AlgSSA algo = new AlgSSA();
 
 		ArrayList<String> result = new ArrayList<>();
@@ -684,9 +686,16 @@ public class AlgSSA {
 //		result =  algo.tikrq(new Point(1259.0, 1258.0, 3), new Point(611.0, 862.0, 3), //
 //				new ArrayList<>(Arrays.asList("390", "-1059", "-318", "7560", "5587")), //
 //				5000, 0.5, 7);
-		result = algo.tikrq(new Point(238.0, 415.0, 4),null, //
-				new ArrayList<>(Arrays.asList("2871", "-701", "787")), //
-				2400, 1, 7,1);
+//		result = algo.tikrq(new Point(238.0, 415.0, 4),null, //
+//				new ArrayList<>(Arrays.asList("2871", "-701", "787")), //
+//				2400, 1, 7,1);
+//		
+		//HSM
+		result = algo.tikrq(new Point(64.0, 67.0, 1),new Point(65.0,68.0,4), //
+				new ArrayList<>(Arrays.asList("-995", "643")), //
+				3500, 1, 7, 0);
+		
+		
 
 		System.out.println("result--------------");
 		for (String path : result) {

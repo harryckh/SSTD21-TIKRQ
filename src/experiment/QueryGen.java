@@ -158,8 +158,11 @@ public class QueryGen {
 			query.ps = genPoint();
 			query.pt = genPoint();
 
-			Partition sPartition = CommonFunction.locPartition(query.ps);
-			Partition tPartition = CommonFunction.locPartition(query.pt);
+//			query.psNew = genPoint();
+//			query.ptNew = genPoint();
+			
+//			Partition sPartition = CommonFunction.locPartition(query.ps);
+//			Partition tPartition = CommonFunction.locPartition(query.pt);
 
 //			// gen timeMax
 //			String fast_path = CommonFunction.findFastestPathP2P(query.ps, query.pt, sPartition, tPartition);
@@ -216,7 +219,10 @@ public class QueryGen {
 			ArrayList<String> result = algo_cikrq.tikrq(query.ps, query.pt, query.q_word, query.timeMax,
 					query.relThreshold, query.k);
 
+//			ArrayList<String> result2 = algo_cikrq.tikrq(query.ps, query.ptNew, query.q_word, query.timeMax,
+//					query.relThreshold, query.k);
 			if (result != null && result.size() == k) {
+//			if (result != null && result.size() == k && result2 != null && result2.size() == k) {
 				System.out.println("success");
 				q_set.add(query);
 
@@ -272,13 +278,13 @@ public class QueryGen {
 //			System.out.println( door.toString());
 //		}
 		int set = 1;
-		for (int j = 5; j <= 5; j = j + 1) {
-			random.setSeed(10);
+		for (int j = 11; j <= 11; j = j + 2) {
+			random.setSeed(2);
 			System.out.println("generating query set " + (set++));
 			/* parameter setting */
-			String fileName = "rq" + j + ".txt";
+			String fileName = "rdk" + j + ".txt";
 			int numOfQueries = 10;
-			int q_word = j;
+			int q_word = 4;
 			double c, i, t;
 //			t = j/10.0;
 //			c = (10.0-j)/20.0;
@@ -288,7 +294,7 @@ public class QueryGen {
 			i = 0.4;
 			t = 0.4;
 			double timeMax = 3500;
-			int k = 7;
+			int k = j;
 
 			double relthreshold = 1;// useless
 

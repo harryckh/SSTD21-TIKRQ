@@ -101,7 +101,7 @@ public class AlgBaseline {
 			// Step 3. (Feasible Route Finding)
 
 //	        System.out.println("findFeasiblePath--------");
-			String feasiblePath = findFeasiblePath2(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(), costMax,
+			String feasiblePath = findFeasiblePath2(sPoint, tPoint, sPartition, tPartition, parSet.getParSet(), parSet.getwTime(), costMax,
 					orderedQW);
 			if (feasiblePath != null && feasiblePath != "") {
 //				System.out.println("feasiblePath:" + parSet.toString() + " " + feasiblePath);
@@ -151,7 +151,7 @@ public class AlgBaseline {
 
 	// find feasible path for a partition set
 	private String findFeasiblePath2(Point sPoint, Point tPoint, Partition sPartition, Partition tPartition,
-			short[] parSet, double costMax, int orderedQW) {
+			short[] parSet, double setWaitTime, double costMax, int orderedQW) {
 		String result = "";
 //		cntFindFeasiblePath++;
 		int ps = -1;
@@ -187,7 +187,9 @@ public class AlgBaseline {
 		MinHeap<Stamp> Q = new MinHeap<>("set");
 
 		// initialize stamp
-		Stamp s0 = new Stamp(sPartition.getmID(), 0, "0" + "\t" + "-1", parList, new ArrayList<>());
+//		Stamp s0 = new Stamp(sPartition.getmID(), 0, "0" + "\t" + "-1", parList, new ArrayList<>());
+		Stamp s0 = new Stamp(sPartition.getmID(), 0, setWaitTime + "\t" + "-1", parList, new ArrayList<>());
+
 		Q.insert(s0);
 
 		while (Q.heapSize > 0) {

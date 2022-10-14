@@ -318,7 +318,7 @@ public class AlgAdaptKoE {
 							String s = convert2String(parSet.getParSet());
 							infeasibleParSets.add(s);
 						}
-						break;
+//						break;///need to check next par with same key !
 					}
 				}
 			}
@@ -519,7 +519,7 @@ public class AlgAdaptKoE {
 //				2400,  7);
 		result = algo_adapt.KoE(new Point(70.0, 55.0, 1), new Point(53.0, 106.0, 1), //
 				new ArrayList<>(Arrays.asList("3805", "-197", "-778", "-551")), //
-				3500, 1, 1);
+				3500, 7);
 
 		long endTime1 = System.currentTimeMillis();
 		long endMem1 = runtime1.totalMemory() - runtime1.freeMemory();

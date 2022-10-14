@@ -93,7 +93,7 @@ public class ExpTIKRQExten {
 //				int times = 10;
 				for (int h = 0; h < numOfRuns; h++) {
 
-					if (alg_opt == 4 || alg_opt == 14) {
+					if (alg_opt%10==4) {
 						algo_cikrq.tikrq(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
 					}
 
@@ -151,6 +151,33 @@ public class ExpTIKRQExten {
 						tmp = algo_Adapt_KoE.KoE(ps, pt, QW, query.timeMax, query.k);
 					} else if (alg_opt == 43) {
 						tmp = algo_baseline.baseline(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
+						// ------------------------------------------------------------------------------------
+
+					}	
+					else if (alg_opt == 51) {
+						tmp = algo_cikrq.tikrq(ps, pt, QW, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 52) {
+						tmp = algo_Adapt_KoE.KoE(query.psNew, pt, QW, query.timeMax, query.k);
+					} else if (alg_opt == 53) {
+						tmp = algo_baseline.baseline(query.psNew, pt, QW, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 54) {
+						tmp = algo_exten.resultUpdateCaseDE(algo_cikrq, query.psNew, pt, QW, query.timeMax, query.relThreshold,
+								query.k);
+					} else if (alg_opt == 55) {
+						tmp = algo_stratch.tikrq(query.psNew, pt, QW, query.timeMax, query.relThreshold, query.k);
+						// ------------------------------------------------------------------------------------
+					} else if (alg_opt == 61) {
+						tmp = algo_cikrq.tikrq(ps,  query.ptNew, QW, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 62) {
+						tmp = algo_Adapt_KoE.KoE(ps,  query.ptNew, QW, query.timeMax, query.k);
+					} else if (alg_opt == 63) {
+						tmp = algo_baseline.baseline(ps,  query.ptNew, QW, query.timeMax, query.relThreshold, query.k);
+					} else if (alg_opt == 64) {
+						tmp = algo_exten.resultUpdateCaseDE(algo_cikrq, ps, query.ptNew, QW, query.timeMax, query.relThreshold,
+								query.k);
+					} else if (alg_opt == 65) {
+						tmp = algo_stratch.tikrq(ps, query.ptNew, QW, query.timeMax, query.relThreshold, query.k);
+						// ------------------------------------------------------------------------------------
 					}
 
 					long end = System.nanoTime();
@@ -220,24 +247,54 @@ public class ExpTIKRQExten {
 		runtime.gc();
 		long start = System.nanoTime();
 
-//		Init.init();
-		Init.init_HSM();
+		Init.init();
+//		Init.init_HSM();
 		
 		ArrayList<String> fileNameList = new ArrayList<>();
 		
-//		fileNameList.add("3000.txt");
-//		fileNameList.add("3100.txt");
-//		fileNameList.add("3200.txt");
-//		fileNameList.add("3300.txt");
-//		fileNameList.add("3400.txt");
+
 		
-//		fileNameList.add("rk7.txt");
-//		fileNameList.add("rk9.txt");
-//		fileNameList.add("rk11.txt");
-//
-//		ArrayList<ArrayList<Query>> qListList = new ArrayList<>();
-//		for (String fileName : fileNameList)
-//			qListList.add(readQuery("/query/" + fileName));
+//		fileNameList.add("drq1.txt");
+//		fileNameList.add("drq2.txt");
+//		fileNameList.add("drq3.txt");
+//		fileNameList.add("drq4.txt");
+//		fileNameList.add("drq5.txt");
+		
+		fileNameList.add("drk1.txt");
+		fileNameList.add("drk3.txt");
+		fileNameList.add("drk5.txt");
+		fileNameList.add("drk7.txt");
+		fileNameList.add("drk9.txt");
+		fileNameList.add("drk11.txt");
+		
+		fileNameList.add("dr3000.txt");
+		fileNameList.add("dr3500.txt");
+		fileNameList.add("dr4000.txt");
+		fileNameList.add("dr4500.txt");
+		fileNameList.add("dr5000.txt");
+//		
+//		fileNameList.add("dq1.txt");
+//		fileNameList.add("dq2.txt");
+//		fileNameList.add("dq3.txt");
+//		fileNameList.add("dq4.txt");
+//		fileNameList.add("dq5.txt");
+		
+//		fileNameList.add("d3000.txt");
+//		fileNameList.add("d3500.txt");
+//		fileNameList.add("d4000.txt");
+//		fileNameList.add("d4500.txt");
+//		fileNameList.add("d5000.txt");
+		
+//		fileNameList.add("dk1.txt");
+//		fileNameList.add("dk3.txt");
+//		fileNameList.add("dk5.txt");
+//		fileNameList.add("dk7.txt");
+//		fileNameList.add("dk9.txt");
+//		fileNameList.add("dk11.txt");
+		
+		ArrayList<ArrayList<Query>> qListList = new ArrayList<>();
+		for (String fileName : fileNameList)
+			qListList.add(readQuery("/query/" + fileName));
 //
 ////		exp("sc4", qListList, 4, 1);
 ////		exp("sc5", qListList, 5, 1);
@@ -254,11 +311,47 @@ public class ExpTIKRQExten {
 //		fileNameList2.add("rk9.txt");
 //		fileNameList2.add("rk11.txt");
 //
-		fileNameList2.add("rq1.txt");
-		fileNameList2.add("rq2.txt");
-		fileNameList2.add("rq3.txt");
-		fileNameList2.add("rq4.txt");
-		fileNameList2.add("rq5.txt");
+//		fileNameList2.add("erq1.txt");
+//		fileNameList2.add("erq2.txt");
+//		fileNameList2.add("erq3.txt");
+//		fileNameList2.add("erq4.txt");
+//		fileNameList2.add("erq5.txt");
+
+//		fileNameList2.add("erk1.txt");
+//		fileNameList2.add("erk3.txt");
+//		fileNameList2.add("erk5.txt");
+//		fileNameList2.add("erk7.txt");
+//		fileNameList2.add("erk9.txt");
+//		fileNameList2.add("erk11.txt");
+//		
+//		fileNameList2.add("er3000.txt");
+//		fileNameList2.add("er3500.txt");
+//		fileNameList2.add("er4000.txt");
+//		fileNameList2.add("er4500.txt");
+//		fileNameList2.add("er5000.txt");
+		
+		
+////
+//		fileNameList2.add("eq1.txt");
+//		fileNameList2.add("eq2.txt");
+//		fileNameList2.add("eq3.txt");
+//		fileNameList2.add("eq4.txt");
+		fileNameList2.add("eq5.txt");
+//
+		
+//		fileNameList2.add("e3000.txt");
+//		fileNameList2.add("e3500.txt");
+//		fileNameList2.add("e4000.txt");
+//		fileNameList2.add("e4500.txt");
+//		fileNameList2.add("e5000.txt");
+		
+//		fileNameList2.add("ek1.txt");
+//		fileNameList2.add("ek3.txt");
+//		fileNameList2.add("ek5.txt");
+//		fileNameList2.add("ek7.txt");
+//		fileNameList2.add("ek9.txt");
+//		fileNameList2.add("ek11.txt");
+		
 
 		ArrayList<ArrayList<Query>> qListList2 = new ArrayList<>();
 		for (String fileName : fileNameList2)
@@ -266,14 +359,25 @@ public class ExpTIKRQExten {
 
 //		exp("rq41", qListList2, 41, 10);
 //		exp("rq42", qListList2, 42, 10);
-		exp("rq43", qListList2, 43, 1);
 		
-		exp("rk21", qListList2, 21, 1);
-		exp("rq31", qListList2, 31, 1);
-		exp("rq22", qListList2, 22, 1);
-		exp("rq32", qListList2, 32, 1);
-		exp("rq23", qListList2, 23, 1);
-		exp("rq33", qListList2, 33, 1);
+//		exp("drkt54", qListList, 54, 5);
+//		exp("drkt55", qListList, 55, 5);
+
+		exp("eq65", qListList2, 65, 50);
+		exp("eq64", qListList2, 64, 50);
+
+//		exp("rdm54", qListList2, 54, 5);
+//		exp("rdm55", qListList2, 55, 5);
+//		
+//		exp("rem64", qListList2, 64, 5);
+//		exp("rem65", qListList2, 65, 5);
+		
+//		exp("rk21", qListList2, 21, 1);
+//		exp("rq31", qListList2, 31, 1);
+//		exp("rq22", qListList2, 22, 1);
+//		exp("rq32", qListList2, 32, 1);
+//		exp("rq23", qListList2, 23, 1);
+//		exp("rq33", qListList2, 33, 1);
 		
 //		exp("rk21", qListList2, 21, 10);
 //		exp("rk31", qListList2, 31, 10);

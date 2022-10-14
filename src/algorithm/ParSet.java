@@ -23,7 +23,7 @@ public class ParSet implements Comparable<ParSet> {
 	private double totalCost = 0;
 	private double alpha = AlgSSA.alpha;
 	public String path = ""; // store the resulting feasible path
-	public double timeCost = 0;
+	public double timeCost = 0; //i.e., time used = path time + waiting time 
 
 	public ParSet(int size) {
 		// TODO Auto-generated constructor stub

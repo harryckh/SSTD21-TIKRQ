@@ -162,16 +162,19 @@ public class ExpTIKRQ {
 		runtime.gc();
 		long start = System.nanoTime();
 
-		Init.init();
+//		Init.init();
+		Init.init_HSM();
+		
 
 		ArrayList<String> fileNameList = new ArrayList<>();
 
-		fileNameList.add("k1.txt");
-		fileNameList.add("k3.txt");
-		fileNameList.add("k5.txt");
-		fileNameList.add("k7.txt");
-		fileNameList.add("k9.txt");
-		fileNameList.add("k11.txt");
+//		fileNameList.add("k1.txt");
+//		fileNameList.add("k3.txt");
+//		fileNameList.add("k5.txt");
+//		fileNameList.add("k7.txt");
+//		fileNameList.add("k9.txt");
+//		fileNameList.add("k11.txt");
+		fileNameList.add("rq5.txt");
 
 		ArrayList<ArrayList<Query>> qListList = new ArrayList<>();
 		for (String fileName : fileNameList)
@@ -179,8 +182,9 @@ public class ExpTIKRQ {
 
 //		exp("q41", qListList, 1, 10);
 //		exp("q42", qListList, 2, 1);
-		exp("q43", qListList, 3, 1);
-
+//		exp("q43", qListList, 3, 1);
+		
+		exp("q5test", qListList, 1, 1);
 
 		long end = System.nanoTime();
 

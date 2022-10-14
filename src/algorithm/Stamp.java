@@ -74,13 +74,13 @@ public class Stamp {
 		return this.R;
 	}
 
-	public void setCost(double cost) {
-		this.cost = cost;
-	}
-
-	public double getCost() {
-		return this.cost;
-	}
+//	public void setCost(double cost) {
+//		this.cost = cost;
+//	}
+//
+//	public double getCost() {
+//		return this.cost;
+//	}
 
 	public void setParList(ArrayList<Integer> parList) {
 		this.parList = parList;
