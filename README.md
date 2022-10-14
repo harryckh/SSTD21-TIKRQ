@@ -1,5 +1,5 @@
 
-# SSTD21-TIKRQ
+# TIKRQ
 
 Notes
 =======================
