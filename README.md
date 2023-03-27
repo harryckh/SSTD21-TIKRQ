@@ -5,7 +5,7 @@ Notes
 =======================
 
 1. This code was used for the empirical study of the SSTD 2021 paper "Time-Constrained Indoor Keyword-aware Routing" and the GeoInformatica paper "Time-Constrained Indoor Keyword-aware Routing: Foundations and Extensions".
-2. This code is developed by Harry Kai-Ho Chan (h.k.chan@sheffield.ac.uk) and Tiantian Liu (liutt@cs.aau.dk).
+2. This code is developed by Harry Kai-Ho Chan (h.k.chan@sheffield.ac.uk) and Tiantian Liu (tliu@ruc.dk).
 3. This code is written in Java.
 4. This code is tested on the macOS 10.15.7 environment.
 
